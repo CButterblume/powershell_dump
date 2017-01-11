@@ -1,0 +1,17 @@
+<Configuration>
+	<Package Id="sts">
+		<Setting Id="LAUNCHEDFROMSETUPSTS" Value="Yes"/>
+	</Package>
+
+	<Package Id="spswfe">
+		<Setting Id="SETUPCALLED" Value="1"/>
+	</Package>
+	
+	<Logging Type="verbose" Path="C:\RIS\Log\SHP2010" Template="SharePoint Server Setup(*).log"/>
+	<PIDKEY Value="6VCWT-QBQVD-HG7KD-8BW8C-PBX7T" />
+	<Display Level="none" CompletionNotice="no" />
+	<Setting Id="USINGUIINSTALLMODE" Value="0"/>
+	<Setting Id="SETUPTYPE" Value="CLEAN_INSTALL"/>
+	<Setting Id="SETUP_REBOOT" Value="Never"/>
+	<INSTALLLOCATION Value="D:\Microsoft SharePoint 2010" />
+</Configuration>
