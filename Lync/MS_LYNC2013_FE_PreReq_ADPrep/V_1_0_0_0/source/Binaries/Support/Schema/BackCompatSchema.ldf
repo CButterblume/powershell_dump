@@ -1,0 +1,3383 @@
+# 1. Allow schema modifications by setting the following NT5 registry value
+#    HKEY_LOCAL_MACHINE\System\CurrentControlSet\Services\NTDS\Parameters
+#    add the value "Schema Update Allowed" as a REG_DWORD value 1
+# 2. Make sure you have wldap32.dll and ldifde.exe (both ship with NT5 builds 1728+)
+#
+# To import this file you type:
+#
+# ldifde -i -v -k -s <servername> -f BackCompatSchema.ldf -c DC=X <defaultNamingContext> -b <admin account> <login domain> <password>
+#
+# e.g. ldifde -i -v -k -s DC1 -f BackCompatSchema.ldf -c DC=X "DC=contoso,DC=com" -b administrator contoso *
+#
+# governsID:
+#     last used value :  1.2.840.113556.1.6.24.2.73
+#
+# attributeID
+#     last used value :  1.2.840.113556.1.6.24.1.201
+#                        (note: 1.2.840.113556.1.6.24.1.99 is being used
+#                         by HomeUsers (deprecated) in LCS2003.)
+#
+# linkID
+#     last used value: 11039
+#
+# If you are applying the schema manually, upload the schema file in following sequence:
+#
+#       ExternalSchema.ldf
+#       ServerSchema.ldf
+#       BackCompatSchema.ldf
+#       VersionSchema.ldf
+
+
+##############################################################
+# NT User Attributes
+##############################################################
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+dn: CN=ms-RTC-SIP-PrimaryHomeServer,CN=Schema,CN=Configuration,DC=X
+# This cannot be a linked attribute to the Server object because W2K has a limit of about 5000 for a linked attribute
+changetype: add
+adminDescription: msRTCSIP-PrimaryHomeServer
+adminDisplayName: msRTCSIP-PrimaryHomeServer
+description: User's Home Server for V1.
+objectclass: attributeSchema
+attributeID: 1.2.840.113556.1.6.24.1.57
+#schemaIDGUID: {5939A055-7A89-4B3B-965A-9948DD1EE4FC}
+schemaIDGUID:: VaA5WYl6O0uWWplI3R7k/A==
+oMSyntax: 127
+attributeSyntax: 2.5.5.1
+isSingleValued: TRUE
+searchFlags: 1
+isMemberOfPartialAttributeSet: TRUE
+ldapDisplayName: msRTCSIP-PrimaryHomeServer
+#Base 64 Encoded GUID of :D819615A3B9B4738B47EF1BD8EE3AEA4
+attributeSecurityGUID:: WmEZ2Js7OEe0fvG9juOupA==
+
+dn: CN=ms-RTC-SIP-TargetHomeServer,CN=Schema,CN=Configuration,DC=X
+# This is used for the moveuser operation to store the destination home server
+changetype: add
+adminDescription: msRTCSIP-TargetHomeServer
+adminDisplayName: msRTCSIP-TargetHomeServer
+description: User's Target Home Server.
+objectclass: attributeSchema
+attributeID: 1.2.840.113556.1.6.24.1.47
+#schemaIDGUID:{e7a78cfb-c157-4abf-80df-2077657a0346}
+schemaIDGUID:: +4yn51fBv0qA3yB3ZXoDRg==
+oMSyntax: 127
+attributeSyntax: 2.5.5.1
+isSingleValued: TRUE
+searchFlags: 0
+isMemberOfPartialAttributeSet: TRUE
+ldapDisplayName: msRTCSIP-TargetHomeServer
+#Base 64 Encoded GUID of :D819615A3B9B4738B47EF1BD8EE3AEA4
+attributeSecurityGUID:: WmEZ2Js7OEe0fvG9juOupA==
+
+dn: CN=ms-RTC-SIP-FederationEnabled,CN=Schema,CN=Configuration,DC=X
+changetype: add
+adminDescription: msRTCSIP-FederationEnabled
+adminDisplayName: msRTCSIP-FederationEnabled
+description: This attribute determines whether the user is currently enabled for Federated SIP Instant Messaging.
+objectclass: attributeSchema
+attributeID: 1.2.840.113556.1.6.24.1.67
+#schemaIDGUID: {86942DD3-0BF4-4612-AF2D-45830B441E47}
+schemaIDGUID:: 0y2UhvQLEkavLUWDC0QeRw==
+oMSyntax: 1
+attributeSyntax: 2.5.5.8
+isSingleValued: TRUE
+searchFlags: 0
+isMemberOfPartialAttributeSet: TRUE
+ldapDisplayName: msRTCSIP-FederationEnabled
+#Base 64 Encoded GUID of :D819615A3B9B4738B47EF1BD8EE3AEA4
+attributeSecurityGUID:: WmEZ2Js7OEe0fvG9juOupA==
+
+dn: CN=ms-RTC-SIP-InternetAccessEnabled,CN=Schema,CN=Configuration,DC=X
+changetype: add
+adminDescription: msRTCSIP-InternetAccessEnabled
+adminDisplayName: msRTCSIP-InternetAccessEnabled
+description: This attribute determines whether the user is currently enabled for accessing SIP Instant Messaging from the internet.
+objectclass: attributeSchema
+attributeID: 1.2.840.113556.1.6.24.1.68
+#schemaIDGUID: {94ABF9ED-4EAE-4553-9582-6FCD5CDDEF42}
+schemaIDGUID:: 7fmrlK5OU0WVgm/NXN3vQg==
+oMSyntax: 1
+attributeSyntax: 2.5.5.8
+isSingleValued: TRUE
+searchFlags: 0
+isMemberOfPartialAttributeSet: TRUE
+ldapDisplayName: msRTCSIP-InternetAccessEnabled
+#Base 64 Encoded GUID of :D819615A3B9B4738B47EF1BD8EE3AEA4
+attributeSecurityGUID:: WmEZ2Js7OEe0fvG9juOupA==
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+dn: CN=User,CN=Schema,CN=Configuration,DC=X
+# NT User Data
+changetype: modify
+add: mayContain
+mayContain: msRTCSIP-TargetHomeServer
+-
+
+dn: CN=User,CN=Schema,CN=Configuration,DC=X
+# NT User Data
+changetype: modify
+add: mayContain
+mayContain: msRTCSIP-PrimaryHomeServer
+-
+
+dn: CN=User,CN=Schema,CN=Configuration,DC=X
+# NT User Data
+changetype: modify
+add: mayContain
+mayContain: msRTCSIP-FederationEnabled
+-
+
+dn: CN=User,CN=Schema,CN=Configuration,DC=X
+# NT User Data
+changetype: modify
+add: mayContain
+mayContain: msRTCSIP-InternetAccessEnabled
+-
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+dn: CN=Contact,CN=Schema,CN=Configuration,DC=X
+# NT Contact Data
+changetype: modify
+add: mayContain
+mayContain: msRTCSIP-TargetHomeServer
+-
+
+dn: CN=Contact,CN=Schema,CN=Configuration,DC=X
+# NT Contact Data
+changetype: modify
+add: mayContain
+mayContain: msRTCSIP-PrimaryHomeServer
+-
+
+dn: CN=Contact,CN=Schema,CN=Configuration,DC=X
+# NT Contact Data
+changetype: modify
+add: mayContain
+mayContain: msRTCSIP-FederationEnabled
+-
+
+dn: CN=Contact,CN=Schema,CN=Configuration,DC=X
+# NT Contact Data
+changetype: modify
+add: mayContain
+mayContain: msRTCSIP-InternetAccessEnabled
+-
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+##############################################################
+# Server Limits
+##############################################################
+dn: CN=ms-RTC-SIP-PoolAddress,CN=Schema,CN=Configuration,DC=X
+changetype: add
+adminDescription: msRTCSIP-PoolAddress
+adminDisplayName: msRTCSIP-PoolAddress
+description: This attribute points to the LCS pool that this server belongs to.
+objectclass: attributeSchema
+attributeID: 1.2.840.113556.1.6.24.1.79
+#schemaIDGUID: {15105928-181C-4619-A566-3D9435E29C97}
+schemaIDGUID:: KFkQFRwYGUalZj2UNeKclw==
+oMSyntax: 127
+attributeSyntax: 2.5.5.1
+linkID: 11022
+isSingleValued: TRUE
+searchFlags: 3
+isMemberOfPartialAttributeSet: TRUE
+ldapDisplayName: msRTCSIP-PoolAddress
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+dn: CN=ms-RTC-SIP-EnterpriseServerSettings,CN=Schema,CN=Configuration,DC=X
+changetype: modify
+add: mayContain
+mayContain: msRTCSIP-PoolAddress
+-
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+##############################################################
+# Server
+##############################################################
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+dn: CN=ms-RTC-SIP-Server,CN=Schema,CN=Configuration,DC=X
+changetype: add
+adminDescription: msRTCSIP-Server
+adminDisplayName: msRTCSIP-Server
+description: Specifies computer as a Live Communications Server.
+objectclass: classSchema
+governsID: 1.2.840.113556.1.6.24.2.5
+#schemaIDGUID:{CD24E3CC-DDDA-4d6d-B19A-DB5D7823B96C}
+schemaIDGUID:: zSTjzN3aTW2xmttdeCO5bA==
+# Allows Full Control for Domain Admins and SYSTEM
+defaultSecurityDescriptor: D:(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;DA)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;SY)
+rdnattid: cn
+objectClassCategory: 1
+possSuperiors: serviceConnectionPoint
+subClassOf: serviceConnectionPoint
+ldapDisplayName: msRTCSIP-Server
+systemAuxiliaryClass: msRTCSIP-EnterpriseServerSettings
+
+##############################################################
+# Registrar Attributes
+##############################################################
+
+dn: CN=ms-RTC-SIP-Registrar,CN=Schema,CN=Configuration,DC=X
+changetype: add
+adminDescription: msRTCSIP-Registrar
+adminDisplayName: msRTCSIP-Registrar
+description: Stores the values for Registrar configuration.
+objectclass: classSchema
+governsID: 1.2.840.113556.1.6.24.2.6
+#schemaIDGUID:{46553EF7-FDE3-4a79-B2C6-4C378496BAB3}
+schemaIDGUID:: RlU+9/3jSnmyxkw3hJa6sw==
+# Allows Full Control for Domain Admins and SYSTEM
+defaultSecurityDescriptor: D:(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;DA)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;SY)
+rdnattid: cn
+objectClassCategory: 3
+subClassOf: top
+ldapDisplayName: msRTCSIP-Registrar
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+
+##############################################################
+# Federation Attributes
+##############################################################
+
+dn: CN=ms-RTC-SIP-Federation,CN=Schema,CN=Configuration,DC=X
+changetype: add
+adminDescription: msRTCSIP-Federation
+adminDisplayName: msRTCSIP-Federation
+description: Stores the federation settings.
+objectclass: classSchema
+governsID: 1.2.840.113556.1.6.24.2.17
+#schemaIDGUID: {0D686B5F-4D5D-41E0-83D5-8180552F04D1}
+schemaIDGUID:: X2toDV1N4EGD1YGAVS8E0Q==
+# Allows Full Control for Domain Admins and SYSTEM
+defaultSecurityDescriptor: D:(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;DA)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;SY)
+rdnattid: cn
+objectClassCategory: 3
+subClassOf: top
+ldapDisplayName: msRTCSIP-Federation
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+##############################################################
+# Search Attributes
+##############################################################
+
+dn: CN=ms-RTC-SIP-Search,CN=Schema,CN=Configuration,DC=X
+changetype: add
+adminDescription: msRTCSIP-Search
+adminDisplayName: msRTCSIP-Search
+description: Stores the limits on directory search operations.
+objectclass: classSchema
+governsID: 1.2.840.113556.1.6.24.2.7
+#schemaIDGUID:{CAE1601E-2756-46d1-8AA9-1D4D3B09C09D}
+schemaIDGUID:: yuFgHidWRtGKqR1NOwnAnQ==
+# Allows Full Control for Domain Admins and SYSTEM
+defaultSecurityDescriptor: D:(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;DA)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;SY)
+rdnattid: cn
+objectClassCategory: 3
+subClassOf: top
+ldapDisplayName: msRTCSIP-Search
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+##############################################################
+# Global Settings
+##############################################################
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+dn: CN=ms-RTC-SIP-GlobalContainer,CN=Schema,CN=Configuration,DC=X
+changetype: add
+adminDescription: msRTCSIP-GlobalContainer
+adminDisplayName: msRTCSIP-GlobalContainer
+description: Container for global information.
+objectclass: classSchema
+governsID: 1.2.840.113556.1.6.24.2.9
+#schemaIDGUID:{40B6FCD9-D25C-4e4b-A86B-7BCB86FB8BC5}
+schemaIDGUID:: QLb82dJcTkuoa3vLhvuLxQ==
+# Allows Full Control for Domain Admins and SYSTEM
+defaultSecurityDescriptor: D:(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;DA)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;SY)
+rdnattid: cn
+objectClassCategory: 1
+possSuperiors: msRTCSIP-Service
+subClassOf: container
+ldapDisplayName: msRTCSIP-GlobalContainer
+systemAuxiliaryClass: msRTCSIP-Registrar
+systemAuxiliaryClass: msRTCSIP-Search
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+dn: CN=ms-RTC-SIP-GlobalContainer,CN=Schema,CN=Configuration,DC=X
+changetype: modify
+add: AuxiliaryClass
+AuxiliaryClass: msRTCSIP-Federation
+-
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+##############################################################
+# Registrar Domains Settings
+##############################################################
+dn: CN=ms-RTC-SIP-DomainName,CN=Schema,CN=Configuration,DC=X
+changetype: add
+adminDescription: msRTCSIP-DomainName
+adminDisplayName: msRTCSIP-DomainName
+description: A domain configured for the Registrar.
+objectclass: attributeSchema
+attributeID: 1.2.840.113556.1.6.24.1.33
+#schemaIDGUID:{5EC946ED-33F0-4267-82E0-352DFC962227}
+schemaIDGUID:: XslG7TPwQmeC4DUt/JYiJw==
+oMSyntax: 64
+attributeSyntax: 2.5.5.12
+isSingleValued: TRUE
+rangeLower: 0
+rangeUpper: 1024
+searchFlags: 0
+isMemberOfPartialAttributeSet: FALSE
+ldapDisplayName: msRTCSIP-DomainName
+
+dn: CN=ms-RTC-SIP-DomainData,CN=Schema,CN=Configuration,DC=X
+#This attribute will contain Name=Value pairs as separate strings.
+changetype: add
+adminDescription: msRTCSIP-DomainData
+adminDisplayName: msRTCSIP-DomainData
+description: This attribute is reserved for future use.
+objectclass: attributeSchema
+attributeID: 1.2.840.113556.1.6.24.1.61
+#schemaIDGUID: {1ED45C00-86A9-4DFB-9ACD-47E05A40CC84}
+schemaIDGUID:: AFzUHqmG+02azUfgWkDMhA==
+oMSyntax: 64
+attributeSyntax: 2.5.5.12
+isSingleValued: FALSE
+searchFlags: 0
+isMemberOfPartialAttributeSet: FALSE
+ldapDisplayName: msRTCSIP-DomainData
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+dn: CN=ms-RTC-SIP-Domain,CN=Schema,CN=Configuration,DC=X
+changetype: add
+adminDescription: msRTCSIP-Domain
+adminDisplayName: msRTCSIP-Domain
+description: This is used to store all the domains for which the Registrar is configured.
+objectclass: classSchema
+governsID: 1.2.840.113556.1.6.24.2.10
+#schemaIDGUID:{A979E9B1-EA3E-43e9-AA9A-1BCC9EEB6DA7}
+schemaIDGUID:: qXnpseo+Q+mqmhvMnuttpw==
+# Allows Full Control for Domain Admins and SYSTEM
+defaultSecurityDescriptor: D:(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;DA)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;SY)
+rdnattid: cn
+objectClassCategory: 1
+possSuperiors: msRTCSIP-GlobalContainer
+subClassOf: container
+ldapDisplayName: msRTCSIP-Domain
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+dn: CN=ms-RTC-SIP-Domain,CN=Schema,CN=Configuration,DC=X
+changetype: modify
+add: mayContain
+mayContain: msRTCSIP-DomainName
+-
+
+dn: CN=ms-RTC-SIP-Domain,CN=Schema,CN=Configuration,DC=X
+changetype: modify
+add: mayContain
+mayContain: msRTCSIP-DomainData
+-
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+##############################################################
+# Trusted Servers
+##############################################################
+
+dn: CN=ms-RTC-SIP-TrustedServerFQDN,CN=Schema,CN=Configuration,DC=X
+# This is the FQDN of one Trusted Server
+changetype: add
+adminDescription: msRTCSIP-TrustedServerFQDN
+adminDisplayName: msRTCSIP-TrustedServerFQDN
+description: Trusted Server FQDN.
+objectclass: attributeSchema
+attributeID: 1.2.840.113556.1.6.24.1.56
+#schemaIDGUID: {7168A926-2CA2-4017-9100-C10B031F9CE0}
+schemaIDGUID:: JqlocaIsF0CRAMELAx+c4A==
+oMSyntax: 64
+attributeSyntax: 2.5.5.12
+isSingleValued: TRUE
+searchFlags: 0
+isMemberOfPartialAttributeSet: FALSE
+ldapDisplayName: msRTCSIP-TrustedServerFQDN
+
+dn: CN=ms-RTC-SIP-TrustedServerData,CN=Schema,CN=Configuration,DC=X
+#This attribute will contain Name=Value pairs as separate strings.
+changetype: add
+adminDescription: msRTCSIP-TrustedServerData
+adminDisplayName: msRTCSIP-TrustedServerData
+description: This attribute is reserved for future use.
+objectclass: attributeSchema
+attributeID: 1.2.840.113556.1.6.24.1.62
+#schemaIDGUID: {1914E220-181C-4BCE-ADC3-D37F75544DFB}
+schemaIDGUID:: IOIUGRwYzkutw9N/dVRN+w==
+oMSyntax: 64
+attributeSyntax: 2.5.5.12
+isSingleValued: FALSE
+searchFlags: 0
+isMemberOfPartialAttributeSet: FALSE
+ldapDisplayName: msRTCSIP-TrustedServerData
+
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+dn: CN=ms-RTC-SIP-TrustedServer,CN=Schema,CN=Configuration,DC=X
+changetype: add
+adminDescription: msRTCSIP-TrustedServer
+adminDisplayName: msRTCSIP-TrustedServer
+description: Stores data about Trusted servers.
+objectclass: classSchema
+governsID: 1.2.840.113556.1.6.24.2.12
+#schemaIDGUID: {2C6CBC07-9B85-4fb5-919F-A987B58BB676}
+schemaIDGUID:: B7xsLIWbtU+Rn6mHtYu2dg==
+# Allows Full Control for Domain Admins and SYSTEM
+defaultSecurityDescriptor: D:(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;DA)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;SY)
+rdnattid: cn
+objectClassCategory: 1
+possSuperiors: msRTCSIP-GlobalContainer
+subClassOf: container
+ldapDisplayName: msRTCSIP-TrustedServer
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+dn: CN=ms-RTC-SIP-TrustedServer,CN=Schema,CN=Configuration,DC=X
+changetype: modify
+add: mayContain
+mayContain: msRTCSIP-TrustedServerFQDN
+-
+
+dn: CN=ms-RTC-SIP-TrustedServer,CN=Schema,CN=Configuration,DC=X
+changetype: modify
+add: mayContain
+mayContain: msRTCSIP-TrustedServerData
+-
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+##############################################################
+# Pools
+##############################################################
+dn: CN=ms-RTC-SIP-Pools,CN=Schema,CN=Configuration,DC=X
+changetype: add
+adminDescription: msRTCSIP-Pools
+adminDisplayName: msRTCSIP-Pools
+description: Container to hold all the pool objects in the enterprise.
+objectclass: classSchema
+governsID: 1.2.840.113556.1.6.24.2.13
+#schemaIDGUID: {3881A7BA-BCF0-4552-810B-146A7DD0459B}
+schemaIDGUID:: uqeBOPC8UkWBCxRqfdBFmw==
+# Allows Full Control for Domain Admins and SYSTEM
+defaultSecurityDescriptor: D:(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;DA)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;SY)
+rdnattid: cn
+objectClassCategory: 1
+subClassOf: container
+possSuperiors: msRTCSIP-Service
+ldapDisplayName: msRTCSIP-Pools
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+# This integer will indicate what kind of pool this is.
+# 2.0 Home Servers (SE) = 1, 2.0 Pool = 2.
+dn: CN=ms-RTC-SIP-PoolType,CN=Schema,CN=Configuration,DC=X
+changetype: add
+adminDescription: msRTCSIP-PoolType
+adminDisplayName: msRTCSIP-PoolType
+description: Type of pool.
+objectclass: attributeSchema
+attributeID: 1.2.840.113556.1.6.24.1.65
+#schemaIDGUID: {655d0794-e357-4a5a-93f6-d479adb25bea}
+schemaIDGUID:: lAddZVfjWkqT9tR5rbJb6g==
+oMSyntax: 2
+attributeSyntax: 2.5.5.9
+isSingleValued: TRUE
+searchFlags: 0
+isMemberOfPartialAttributeSet: FALSE
+ldapDisplayName: msRTCSIP-PoolType
+
+dn: CN=ms-RTC-SIP-PoolDisplayName,CN=Schema,CN=Configuration,DC=X
+changetype: add
+adminDescription: msRTCSIP-PoolDisplayName
+adminDisplayName: msRTCSIP-PoolDisplayName
+description: This attribute is used to store the display name for the pool.
+objectclass: attributeSchema
+attributeID: 1.2.840.113556.1.6.24.1.74
+#schemaIDGUID: {F9B4C9B4-9CFA-45C3-82F7-0241A4F0124C}
+schemaIDGUID:: tMm0+fqcw0WC9wJBpPASTA==
+oMSyntax: 64
+attributeSyntax: 2.5.5.12
+isSingleValued: TRUE
+searchFlags: 0
+isMemberOfPartialAttributeSet: FALSE
+ldapDisplayName: msRTCSIP-PoolDisplayName
+
+dn: CN=ms-RTC-SIP-FrontEndServers,CN=Schema,CN=Configuration,DC=X
+changetype: add
+adminDescription: msRTCSIP-FrontEndServers
+adminDisplayName: msRTCSIP-FrontEndServers
+description: This attribute is the list of FrontEnds that belong to this pool
+objectclass: attributeSchema
+attributeID: 1.2.840.113556.1.6.24.1.75
+#schemaIDGUID: {1416F568-BC0B-4483-BC59-7FC92149AD30}
+schemaIDGUID:: aPUWFAu8g0S8WX/JIUmtMA==
+oMSyntax: 127
+attributeSyntax: 2.5.5.1
+linkID: 11023
+isSingleValued: FALSE
+searchFlags: 0
+isMemberOfPartialAttributeSet: TRUE
+ldapDisplayName: msRTCSIP-FrontEndServers
+
+dn: CN=ms-RTC-SIP-PoolData,CN=Schema,CN=Configuration,DC=X
+#This attribute will contain Name=Value pairs as separate strings.
+changetype: add
+adminDescription: msRTCSIP-PoolData
+adminDisplayName: msRTCSIP-PoolData
+description: This attribute is reserved for future use.
+objectclass: attributeSchema
+attributeID: 1.2.840.113556.1.6.24.1.76
+#schemaIDGUID: {37CBE17A-9E6A-4D39-92A7-4741034CCCBC}
+schemaIDGUID:: euHLN2qeOU2Sp0dBA0zMvA==
+oMSyntax: 64
+attributeSyntax: 2.5.5.12
+isSingleValued: FALSE
+searchFlags: 0
+isMemberOfPartialAttributeSet: FALSE
+ldapDisplayName: msRTCSIP-PoolData
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+dn: CN=ms-RTC-SIP-Pool,CN=Schema,CN=Configuration,DC=X
+changetype: add
+adminDescription: msRTCSIP-Pool
+adminDisplayName: msRTCSIP-Pool
+description: The actual pool object.
+objectclass: classSchema
+governsID: 1.2.840.113556.1.6.24.2.14
+#schemaIDGUID: {81A6B03B-DDD3-4FA7-8190-2DFA935E54BA}
+schemaIDGUID:: O7CmgdPdp0+BkC36k15Uug==
+# Allows Full Control for Domain Admins and SYSTEM
+defaultSecurityDescriptor: D:(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;DA)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;SY)
+rdnattid: cn
+objectClassCategory: 1
+subClassOf: container
+possSuperiors: msRTCSIP-Pools
+ldapDisplayName: msRTCSIP-Pool
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+dn: CN=ms-RTC-SIP-Pool,CN=Schema,CN=Configuration,DC=X
+changetype: modify
+add: mayContain
+mayContain: msRTCSIP-BackEndServer
+-
+
+dn: CN=ms-RTC-SIP-Pool,CN=Schema,CN=Configuration,DC=X
+changetype: modify
+add: mayContain
+mayContain: msRTCSIP-PoolType
+-
+
+dn: CN=ms-RTC-SIP-Pool,CN=Schema,CN=Configuration,DC=X
+changetype: modify
+add: mayContain
+mayContain: msRTCSIP-PoolDisplayName
+-
+
+dn: CN=ms-RTC-SIP-Pool,CN=Schema,CN=Configuration,DC=X
+changetype: modify
+add: mayContain
+mayContain: msRTCSIP-PoolData
+-
+
+dn: CN=ms-RTC-SIP-Pool,CN=Schema,CN=Configuration,DC=X
+changetype: modify
+add: mayContain
+maycontain: dnsHostName
+-
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+dn: CN=ms-RTC-SIP-PoolService,CN=Schema,CN=Configuration,DC=X
+changetype: add
+adminDescription: msRTCSIP-PoolService
+adminDisplayName: msRTCSIP-PoolService
+description: Node that all the users are homed on.
+objectclass: classSchema
+governsID: 1.2.840.113556.1.6.24.2.15
+#schemaIDGUID: {52A40386-F426-4265-B80F-B2E0517DA4B1}
+schemaIDGUID:: hgOkUib0ZUK4D7LgUX2ksQ==
+# Allows Full Control for Domain Admins and SYSTEM
+defaultSecurityDescriptor: D:(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;DA)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;SY)
+rdnattid: cn
+objectClassCategory: 1
+possSuperiors: container
+subClassOf: serviceConnectionPoint
+ldapDisplayName: msRTCSIP-PoolService
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+dn: CN=ms-RTC-SIP-PoolService,CN=Schema,CN=Configuration,DC=X
+changetype: modify
+add: mayContain
+mayContain: msRTCSIP-FrontEndServers
+-
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+##############################################################
+# Edge Proxy Servers
+##############################################################
+dn: CN=ms-RTC-SIP-EdgeProxyFQDN,CN=Schema,CN=Configuration,DC=X
+# This is the FQDN of one Edge Proxy
+changetype: add
+adminDescription: msRTCSIP-EdgeProxyFQDN
+adminDisplayName: msRTCSIP-EdgeProxyFQDN
+description: Edge Proxy FQDN.
+objectclass: attributeSchema
+attributeID: 1.2.840.113556.1.6.24.1.77
+#schemaIDGUID: {45D5AE0C-4E63-428A-94B1-9DB0A0D19549}
+schemaIDGUID:: DK7VRWNOikKUsZ2woNGVSQ==
+oMSyntax: 64
+attributeSyntax: 2.5.5.12
+isSingleValued: TRUE
+searchFlags: 0
+isMemberOfPartialAttributeSet: FALSE
+ldapDisplayName: msRTCSIP-EdgeProxyFQDN
+
+dn: CN=ms-RTC-SIP-EdgeProxyData,CN=Schema,CN=Configuration,DC=X
+#This attribute will contain Name=Value pairs as separate strings.
+changetype: add
+adminDescription: msRTCSIP-EdgeProxyData
+adminDisplayName: msRTCSIP-EdgeProxyData
+description: This attribute is reserved for future use.
+objectclass: attributeSchema
+attributeID: 1.2.840.113556.1.6.24.1.78
+#schemaIDGUID: {F48D91C6-FEBF-4568-B327-9D27EA8AFD70}
+schemaIDGUID:: xpGN9L/+aEWzJ50n6or9cA==
+oMSyntax: 64
+attributeSyntax: 2.5.5.12
+isSingleValued: FALSE
+searchFlags: 0
+isMemberOfPartialAttributeSet: FALSE
+ldapDisplayName: msRTCSIP-EdgeProxyData
+
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+
+dn: CN=ms-RTC-SIP-EdgeProxy,CN=Schema,CN=Configuration,DC=X
+changetype: add
+adminDescription: msRTCSIP-EdgeProxy
+adminDisplayName: msRTCSIP-EdgeProxy
+description: Representative object for an Edge Proxy in the DMZ.
+objectclass: classSchema
+governsID: 1.2.840.113556.1.6.24.2.16
+#schemaIDGUID: {8E93C41F-ADD2-4402-9947-FD4E7750FF9C}
+schemaIDGUID:: H8STjtKtAkSZR/1Od1D/nA==
+# Allows Full Control for Domain Admins and SYSTEM
+defaultSecurityDescriptor: D:(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;DA)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;SY)
+rdnattid: cn
+objectClassCategory: 1
+possSuperiors: msRTCSIP-GlobalContainer
+subClassOf: container
+ldapDisplayName: msRTCSIP-EdgeProxy
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+dn: CN=ms-RTC-SIP-EdgeProxy,CN=Schema,CN=Configuration,DC=X
+changetype: modify
+add: mayContain
+mayContain: msRTCSIP-EdgeProxyFQDN
+-
+
+dn: CN=ms-RTC-SIP-EdgeProxy,CN=Schema,CN=Configuration,DC=X
+changetype: modify
+add: mayContain
+mayContain: msRTCSIP-EdgeProxyData
+-
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+##############################################################
+# User/Contact Attribute
+##############################################################
+dn: CN=ms-RTC-SIP-ArchivingEnabled,CN=Schema,CN=Configuration,DC=X
+changetype: add
+adminDescription: msRTCSIP-ArchivingEnabled
+adminDisplayName: msRTCSIP-ArchivingEnabled
+description: This attribute determines whether the user’s communications are to be archived or not.
+objectclass: attributeSchema
+attributeID: 1.2.840.113556.1.6.24.1.80
+#schemaIDGUID:{DD15CC4F-5EFD-41AD-AB7E-4EF2EAC936C1}
+schemaIDGUID:: T8wV3f1erUGrfk7y6sk2wQ==
+oMSyntax: 2
+attributeSyntax: 2.5.5.9
+isSingleValued: TRUE
+searchFlags: 0
+rangeLower: 0
+rangeUpper: 2
+isMemberOfPartialAttributeSet: TRUE
+ldapDisplayName: msRTCSIP-ArchivingEnabled
+#Base 64 Encoded GUID of :D819615A3B9B4738B47EF1BD8EE3AEA4
+attributeSecurityGUID:: WmEZ2Js7OEe0fvG9juOupA==
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+dn: CN=User,CN=Schema,CN=Configuration,DC=X
+# NT User Data
+changetype: modify
+add: mayContain
+mayContain: msRTCSIP-ArchivingEnabled
+-
+
+dn: CN=Contact,CN=Schema,CN=Configuration,DC=X
+# NT Contact Data
+changetype: modify
+add: mayContain
+mayContain: msRTCSIP-ArchivingEnabled
+-
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+##############################################################
+# RTC Trusted Server Version
+##############################################################
+
+dn: CN=ms-RTC-SIP-TrustedServerVersion,CN=Schema,CN=Configuration,DC=X
+changetype: add
+adminDescription: msRTCSIP-TrustedServerVersion
+adminDisplayName: msRTCSIP-TrustedServerVersion
+description: Attribute that gives the version number of a server in the trusted server list.
+objectclass: attributeSchema
+attributeID: 1.2.840.113556.1.6.24.1.84
+#schemaIDGUID: {06204A27-5C2E-405D-8BC5-6C5D708FBA00}
+schemaIDGUID:: J0ogBi5cXUCLxWxdcI+6AA==
+oMSyntax: 2
+attributeSyntax: 2.5.5.9
+isSingleValued: TRUE
+searchFlags: 0
+rangeLower:  1
+isMemberOfPartialAttributeSet: FALSE
+ldapDisplayName: msRTCSIP-TrustedServerVersion
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+dn: CN=ms-RTC-SIP-TrustedServer,CN=Schema,CN=Configuration,DC=X
+changetype: modify
+add: mayContain
+mayContain: msRTCSIP-TrustedServerVersion
+-
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+##############################################################
+# Pool attribute
+##############################################################
+
+dn: CN=ms-RTC-SIP-PoolVersion,CN=Schema,CN=Configuration,DC=X
+changetype: add
+adminDescription: msRTCSIP-PoolVersion
+adminDisplayName: msRTCSIP-PoolVersion
+description: This attribute contains the version of a pool.
+objectclass: attributeSchema
+attributeID: 1.2.840.113556.1.6.24.1.91
+#schemaIDGUID: {ebc04825-cefe-4a06-8a2f-ec5e30332a9c}
+schemaIDGUID:: JUjA6/7OBkqKL+xeMDMqnA==
+oMSyntax: 2
+attributeSyntax: 2.5.5.9
+isSingleValued: TRUE
+searchFlags: 0
+isMemberOfPartialAttributeSet: FALSE
+ldapDisplayName: msRTCSIP-PoolVersion
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+dn: CN=ms-RTC-SIP-Pool,CN=Schema,CN=Configuration,DC=X
+changetype: modify
+add: mayContain
+mayContain: msRTCSIP-PoolVersion
+-
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+##############################################################
+# User/Contact attribute changes
+##############################################################
+
+dn: CN=ms-RTC-SIP-OptionFlags,CN=Schema,CN=Configuration,DC=X
+changetype: modify
+replace:searchFlags
+searchFlags: 0
+-
+
+dn: CN=ms-RTC-SIP-LineServer,CN=Schema,CN=Configuration,DC=X
+changetype: modify
+replace:searchFlags
+searchFlags: 5
+-
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+##############################################################
+# Pool functionality attribute.
+##############################################################
+dn: CN=ms-RTC-SIP-PoolFunctionality,CN=Schema,CN=Configuration,DC=X
+changetype: add
+adminDescription: msRTCSIP-PoolFunctionality
+adminDisplayName: msRTCSIP-PoolFunctionality
+description: This attribute defines the functionality of a pool.
+objectclass: attributeSchema
+attributeID: 1.2.840.113556.1.6.24.1.90
+#schemaIDGUID: {7a277812-04e9-48d9-8738-a0340c1ef866}
+schemaIDGUID:: EngneukE2UiHOKA0DB74Zg==
+oMSyntax: 2
+attributeSyntax: 2.5.5.9
+isSingleValued: TRUE
+searchFlags: 0
+isMemberOfPartialAttributeSet: FALSE
+ldapDisplayName: msRTCSIP-PoolFunctionality
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+dn: CN=ms-RTC-SIP-Pool,CN=Schema,CN=Configuration,DC=X
+changetype: modify
+add: mayContain
+mayContain: msRTCSIP-PoolFunctionality
+-
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+##############################################################
+# MCU
+##############################################################
+dn: CN=ms-RTC-SIP-MCUFactoryAddress,CN=Schema,CN=Configuration,DC=X
+changetype: add
+adminDescription: msRTCSIP-MCUFactoryAddress
+adminDisplayName: msRTCSIP-MCUFactoryAddress
+description: This attribute points to the MCU factory that this MCU belongs to.
+objectclass: attributeSchema
+attributeID: 1.2.840.113556.1.6.24.1.104
+#schemaIDGUID: {da691157-3763-468d-89fe-78b0ee57512d}
+schemaIDGUID:: VxFp2mM3jUaJ/niw7ldRLQ==
+oMSyntax: 127
+attributeSyntax: 2.5.5.1
+linkID: 11026
+isSingleValued: TRUE
+searchFlags: 3
+isMemberOfPartialAttributeSet: TRUE
+ldapDisplayName: msRTCSIP-MCUFactoryAddress
+
+dn: CN=ms-RTC-SIP-MCUData,CN=Schema,CN=Configuration,DC=X
+changetype: add
+adminDescription: msRTCSIP-MCUData
+adminDisplayName: msRTCSIP-MCUData
+description: This attribute is reserved for future use.
+objectclass: attributeSchema
+attributeID: 1.2.840.113556.1.6.24.1.105
+#schemaIDGUID: {00e2a781-40b3-46b0-9114-7d7b8b6d2363}
+schemaIDGUID:: gafiALNAsEaRFH17i20jYw==
+oMSyntax: 64
+attributeSyntax: 2.5.5.12
+isSingleValued: FALSE
+searchFlags: 0
+isMemberOfPartialAttributeSet: FALSE
+ldapDisplayName: msRTCSIP-MCUData
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+dn: CN=ms-RTC-SIP-EnterpriseMCUSettings,CN=Schema,CN=Configuration,DC=X
+changetype: add
+adminDescription: msRTCSIP-EnterpriseMCUSettings
+adminDisplayName: msRTCSIP-EnterpriseMCUSettings
+description: Container for configuration values for MCU.
+objectclass: classSchema
+governsID: 1.2.840.113556.1.6.24.2.25
+#schemaIDGUID:{0b5fd3da-6e11-4064-bb41-913e85fd4c88}
+schemaIDGUID:: 2tNfCxFuZEC7QZE+hf1MiA==
+# Allows Full Control for Domain Admins and SYSTEM
+defaultSecurityDescriptor: D:(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;DA)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;SY)
+rdnattid: cn
+objectClassCategory: 3
+subClassOf: top
+ldapDisplayName: msRTCSIP-EnterpriseMCUSettings
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+dn: CN=ms-RTC-SIP-EnterpriseMCUSettings,CN=Schema,CN=Configuration,DC=X
+changetype: modify
+add: mayContain
+mayContain: msRTCSIP-ServerVersion
+-
+
+dn: CN=ms-RTC-SIP-EnterpriseMCUSettings,CN=Schema,CN=Configuration,DC=X
+changetype: modify
+add: mayContain
+mayContain: msRTCSIP-MCUData
+-
+
+dn: CN=ms-RTC-SIP-EnterpriseMCUSettings,CN=Schema,CN=Configuration,DC=X
+changetype: modify
+add: mayContain
+mayContain: msRTCSIP-MCUFactoryAddress
+-
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+dn: CN=ms-RTC-SIP-MCU,CN=Schema,CN=Configuration,DC=X
+changetype: add
+adminDescription: msRTCSIP-MCU
+adminDisplayName: msRTCSIP-MCU
+description: Specifies computer as a Live Server MCU.
+objectclass: classSchema
+governsID: 1.2.840.113556.1.6.24.2.26
+#schemaIDGUID:{115548a9-d3f2-4d97-9f73-1a90a62375a9}
+schemaIDGUID:: qUhVEfLTl02fcxqQpiN1qQ==
+# Allows Full Control for Domain Admins and SYSTEM
+defaultSecurityDescriptor: D:(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;DA)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;SY)
+rdnattid: cn
+objectClassCategory: 1
+possSuperiors: serviceConnectionPoint
+subClassOf: serviceConnectionPoint
+ldapDisplayName: msRTCSIP-MCU
+systemAuxiliaryClass: msRTCSIP-EnterpriseMCUSettings
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+
+##############################################################
+# MCU Factory Service class on pool object.
+##############################################################
+dn: CN=ms-RTC-SIP-MCUFactoryPath,CN=Schema,CN=Configuration,DC=X
+changetype: add
+adminDescription: msRTCSIP-MCUFactoryPath
+adminDisplayName: msRTCSIP-MCUFactoryPath
+description: This attribute points to the MCU factory that serves this pool.
+objectclass: attributeSchema
+attributeID: 1.2.840.113556.1.6.24.1.107
+#schemaIDGUID: {8a47de9a-a01c-47d0-8b8b-521ea552114e}
+schemaIDGUID:: mt5Hihyg0EeLi1IepVIRTg==
+oMSyntax: 127
+attributeSyntax: 2.5.5.1
+linkID: 11024
+isSingleValued: TRUE
+searchFlags: 3
+isMemberOfPartialAttributeSet: TRUE
+ldapDisplayName: msRTCSIP-MCUFactoryPath
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+dn: CN=ms-RTC-SIP-MCUFactoryService,CN=Schema,CN=Configuration,DC=X
+changetype: add
+adminDescription: msRTCSIP-MCUFactoryService
+adminDisplayName: msRTCSIP-MCUFactoryService
+description: node that points to a MCU factory that serves this pool.
+objectclass: classSchema
+governsID: 1.2.840.113556.1.6.24.2.27
+#schemaIDGUID: {3f2ef71b-77e9-4aab-a875-da3e504f9925}
+schemaIDGUID:: G/cuP+l3q0qoddo+UE+ZJQ==
+# Allows Full Control for Domain Admins and SYSTEM
+defaultSecurityDescriptor: D:(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;DA)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;SY)
+rdnattid: cn
+objectClassCategory: 1
+possSuperiors: container
+subClassOf: serviceConnectionPoint
+ldapDisplayName: msRTCSIP-MCUFactoryService
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+dn: CN=ms-RTC-SIP-MCUFactoryService,CN=Schema,CN=Configuration,DC=X
+changetype: modify
+add: mayContain
+mayContain: msRTCSIP-MCUFactoryPath
+-
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+##############################################################
+# MCU Factory
+##############################################################
+
+dn: CN=ms-RTC-SIP-MCUFactories,CN=Schema,CN=Configuration,DC=X
+changetype: add
+adminDescription: msRTCSIP-MCUFactories
+adminDisplayName: msRTCSIP-MCUFactories
+description: Container to hold all MCU Factory object.
+objectclass: classSchema
+governsID: 1.2.840.113556.1.6.24.2.23
+#schemaIDGUID: {b3913ee1-26c0-45eb-98e9-4446ac44921c}
+schemaIDGUID:: 4T6Rs8Am60WY6URGrESSHA==
+# Allows Full Control for Domain Admins and SYSTEM
+defaultSecurityDescriptor: D:(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;DA)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;SY)
+rdnattid: cn
+objectClassCategory: 1
+subClassOf: container
+possSuperiors: msRTCSIP-Service
+ldapDisplayName: msRTCSIP-MCUFactories
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+dn: CN=ms-RTC-SIP-PoolAddresses,CN=Schema,CN=Configuration,DC=X
+changetype: add
+adminDescription: msRTCSIP-PoolAddresses
+adminDisplayName: msRTCSIP-PoolAddresses
+description: This attribute is the list of pools that the MCU factory serves.
+objectclass: attributeSchema
+attributeID: 1.2.840.113556.1.6.24.1.98
+#schemaIDGUID: {cda70c7e-af05-45e7-9abd-8813d7255821}
+schemaIDGUID:: fgynzQWv50WavYgT1yVYIQ==
+oMSyntax: 127
+attributeSyntax: 2.5.5.1
+linkID: 11025
+isSingleValued: FALSE
+searchFlags: 0
+isMemberOfPartialAttributeSet: TRUE
+ldapDisplayName: msRTCSIP-PoolAddresses
+
+dn: CN=ms-RTC-SIP-MCUType,CN=Schema,CN=Configuration,DC=X
+changetype: add
+adminDescription: msRTCSIP-MCUType
+adminDisplayName: msRTCSIP-MCUType
+description: Type of the MCU objects this MCU factory contains.
+objectclass: attributeSchema
+attributeID: 1.2.840.113556.1.6.24.1.100
+#schemaIDGUID: {d0d6d978-d258-477d-8e67-cf751844aaba}
+schemaIDGUID:: eNnW0FjSfUeOZ891GESqug==
+oMSyntax: 64
+attributeSyntax: 2.5.5.12
+isSingleValued: TRUE
+searchFlags: 0
+isMemberOfPartialAttributeSet: FALSE
+ldapDisplayName: msRTCSIP-MCUType
+
+dn: CN=ms-RTC-SIP-MCUServers,CN=Schema,CN=Configuration,DC=X
+changetype: add
+adminDescription: msRTCSIP-MCUServers
+adminDisplayName: msRTCSIP-MCUServers
+description: This attribute is the list of MCUs that the MCU factory contains.
+objectclass: attributeSchema
+attributeID: 1.2.840.113556.1.6.24.1.101
+#schemaIDGUID: {0587fb98-082f-4363-937d-1c74ab88ff4d}
+schemaIDGUID:: mPuHBS8IY0OTfRx0q4j/TQ==
+oMSyntax: 127
+attributeSyntax: 2.5.5.1
+linkID: 11027
+isSingleValued: FALSE
+searchFlags: 0
+isMemberOfPartialAttributeSet: TRUE
+ldapDisplayName: msRTCSIP-MCUServers
+
+dn: CN=ms-RTC-SIP-MCUVendor,CN=Schema,CN=Configuration,DC=X
+changetype: add
+adminDescription: msRTCSIP-MCUVendor
+adminDisplayName: msRTCSIP-MCUVendor
+description: This attribute contains the name of the MCU vendor.
+objectclass: attributeSchema
+attributeID: 1.2.840.113556.1.6.24.1.102
+#schemaIDGUID: {e57886dc-70d7-4254-a71d-9373dd36d5a7}
+schemaIDGUID:: 3IZ45ddwVEKnHZNz3TbVpw==
+oMSyntax: 64
+attributeSyntax: 2.5.5.12
+isSingleValued: TRUE
+searchFlags: 0
+isMemberOfPartialAttributeSet: FALSE
+ldapDisplayName: msRTCSIP-MCUVendor
+
+dn: CN=ms-RTC-SIP-MCUFactoryData,CN=Schema,CN=Configuration,DC=X
+changetype: add
+adminDescription: msRTCSIP-MCUFactoryData
+adminDisplayName: msRTCSIP-MCUFactoryData
+description: This attribute is reserved for future use.
+objectclass: attributeSchema
+attributeID: 1.2.840.113556.1.6.24.1.103
+#schemaIDGUID: {adbe5ff0-0ef6-45dc-9b48-d9139ab1f96d}
+schemaIDGUID:: 8F++rfYO3EWbSNkTmrH5bQ==
+oMSyntax: 64
+attributeSyntax: 2.5.5.12
+isSingleValued: FALSE
+searchFlags: 0
+isMemberOfPartialAttributeSet: FALSE
+ldapDisplayName: msRTCSIP-MCUFactoryData
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+dn: CN=ms-RTC-SIP-MCUFactory,CN=Schema,CN=Configuration,DC=X
+changetype: add
+adminDescription: msRTCSIP-MCUFactory
+adminDisplayName: msRTCSIP-MCUFactory
+description: The actual MCU factory object.
+objectclass: classSchema
+governsID: 1.2.840.113556.1.6.24.2.24
+#schemaIDGUID: {5b9d4b0e-26d3-4879-8152-baf9df55f3d3}
+schemaIDGUID:: DkudW9MmeUiBUrr531Xz0w==
+# Allows Full Control for Domain Admins and SYSTEM
+defaultSecurityDescriptor: D:(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;DA)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;SY)
+rdnattid: cn
+objectClassCategory: 1
+subClassOf: container
+possSuperiors: msRTCSIP-MCUFactories
+ldapDisplayName: msRTCSIP-MCUFactory
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+dn: CN=ms-RTC-SIP-MCUFactory,CN=Schema,CN=Configuration,DC=X
+changetype: modify
+add: mayContain
+mayContain: msRTCSIP-PoolAddresses
+-
+
+dn: CN=ms-RTC-SIP-MCUFactory,CN=Schema,CN=Configuration,DC=X
+changetype: modify
+add: mayContain
+mayContain: msRTCSIP-MCUType
+-
+
+dn: CN=ms-RTC-SIP-MCUFactory,CN=Schema,CN=Configuration,DC=X
+changetype: modify
+add: mayContain
+mayContain: msRTCSIP-MCUServers
+-
+
+dn: CN=ms-RTC-SIP-MCUFactory,CN=Schema,CN=Configuration,DC=X
+changetype: modify
+add: mayContain
+mayContain: msRTCSIP-MCUVendor
+-
+
+dn: CN=ms-RTC-SIP-MCUFactory,CN=Schema,CN=Configuration,DC=X
+changetype: modify
+add: mayContain
+mayContain: msRTCSIP-ServerVersion
+-
+
+dn: CN=ms-RTC-SIP-MCUFactory,CN=Schema,CN=Configuration,DC=X
+changetype: modify
+add: mayContain
+mayContain: msRTCSIP-MCUFactoryData
+-
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+##############################################################
+# Change archving flag attribute's upper range on user object.
+##############################################################
+dn: CN=ms-RTC-SIP-ArchivingEnabled,CN=Schema,CN=Configuration,DC=X
+changetype: modify
+replace: rangeUpper
+rangeUpper: 127
+-
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+##############################################################
+# New classes/attributes for WebComponents
+##############################################################
+dn: CN=ms-RTC-SIP-WebComponentsPoolAddress,CN=Schema,CN=Configuration,DC=X
+changetype: add
+adminDescription: msRTCSIP-WebComponentsPoolAddress
+adminDisplayName: msRTCSIP-WebComponentsPoolAddress
+description: This attribute points to the pool that this WebComponenets belongs to.
+objectclass: attributeSchema
+attributeID: 1.2.840.113556.1.6.24.1.110
+#schemaIDGUID: {65ef3173-3c94-47c1-8f0e-7f5526b10ee8}
+schemaIDGUID:: czHvZZQ8wUePDn9VJrEO6A==
+oMSyntax: 127
+attributeSyntax: 2.5.5.1
+linkID: 11028
+isSingleValued: TRUE
+searchFlags: 3
+isMemberOfPartialAttributeSet: TRUE
+ldapDisplayName: msRTCSIP-WebComponentsPoolAddress
+
+dn: CN=ms-RTC-SIP-WebComponentsData,CN=Schema,CN=Configuration,DC=X
+changetype: add
+adminDescription: msRTCSIP-WebComponentsData
+adminDisplayName: msRTCSIP-WebComponentsData
+description: This attribute is reserved for future use.
+objectclass: attributeSchema
+attributeID: 1.2.840.113556.1.6.24.1.111
+#schemaIDGUID: {2495fa6b-c687-40f4-b147-4dd1d3836fbf}
+schemaIDGUID:: a/qVJIfG9ECxR03R04Nvvw==
+oMSyntax: 64
+attributeSyntax: 2.5.5.12
+isSingleValued: FALSE
+searchFlags: 0
+isMemberOfPartialAttributeSet: FALSE
+ldapDisplayName: msRTCSIP-WebComponentsData
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+dn: CN=ms-RTC-SIP-WebComponentSettings,CN=Schema,CN=Configuration,DC=X
+changetype: add
+adminDescription: msRTCSIP-WebComponentSettings
+adminDisplayName: msRTCSIP-WebComponentSettings
+description: Container for configuration values for WebComponents.
+objectclass: classSchema
+governsID: 1.2.840.113556.1.6.24.2.29
+#schemaIDGUID:{822d71ec-5e9b-40e2-a172-9931d64386a1}
+schemaIDGUID:: 7HEtgpte4kChcpkx1kOGoQ==
+# Allows Full Control for Domain Admins and SYSTEM
+defaultSecurityDescriptor: D:(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;DA)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;SY)
+rdnattid: cn
+objectClassCategory: 3
+subClassOf: top
+ldapDisplayName: msRTCSIP-WebComponentSettings
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+dn: CN=ms-RTC-SIP-WebComponentSettings,CN=Schema,CN=Configuration,DC=X
+changetype: modify
+add: mayContain
+mayContain: msRTCSIP-ServerVersion
+-
+
+dn: CN=ms-RTC-SIP-WebComponentSettings,CN=Schema,CN=Configuration,DC=X
+changetype: modify
+add: mayContain
+mayContain: msRTCSIP-WebComponentsData
+-
+
+dn: CN=ms-RTC-SIP-WebComponentSettings,CN=Schema,CN=Configuration,DC=X
+changetype: modify
+add: mayContain
+mayContain: msRTCSIP-WebComponentsPoolAddress
+-
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+dn: CN=ms-RTC-SIP-WebComponents,CN=Schema,CN=Configuration,DC=X
+changetype: add
+adminDescription: msRTCSIP-WebComponents
+adminDisplayName: msRTCSIP-WebComponents
+description: Specifies computer as a Live Server WebComponents Server.
+objectclass: classSchema
+governsID: 1.2.840.113556.1.6.24.2.30
+#schemaIDGUID:{473e3eb4-be2b-45b5-8899-b5671a3cab02}
+schemaIDGUID:: tD4+Ryu+tUWImbVnGjyrAg==
+# Allows Full Control for Domain Admins and SYSTEM
+defaultSecurityDescriptor: D:(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;DA)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;SY)
+rdnattid: cn
+objectClassCategory: 1
+possSuperiors: serviceConnectionPoint
+subClassOf: serviceConnectionPoint
+ldapDisplayName: msRTCSIP-WebComponents
+systemAuxiliaryClass: msRTCSIP-WebComponentSettings
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+##############################################################
+# New classes/attributes for the backward linked attributes
+# for WebComponents on pool object.
+##############################################################
+dn: CN=ms-RTC-SIP-WebComponentsServers,CN=Schema,CN=Configuration,DC=X
+changetype: add
+adminDescription: msRTCSIP-WebComponentsServers
+adminDisplayName: msRTCSIP-WebComponentsServers
+description: This attribute is the list of WebComponents servers that work with this pool
+objectclass: attributeSchema
+attributeID: 1.2.840.113556.1.6.24.1.112
+#schemaIDGUID: {f24c2598-1488-4c41-af79-4301363de6e2}
+schemaIDGUID:: mCVM8ogUQUyveUMBNj3m4g==
+oMSyntax: 127
+attributeSyntax: 2.5.5.1
+linkID: 11029
+isSingleValued: FALSE
+searchFlags: 0
+isMemberOfPartialAttributeSet: TRUE
+ldapDisplayName: msRTCSIP-WebComponentsServers
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+dn: CN=ms-RTC-SIP-WebComponentsService,CN=Schema,CN=Configuration,DC=X
+changetype: add
+adminDescription: msRTCSIP-WebComponentsService
+adminDisplayName: msRTCSIP-WebComponentsService
+description: WebComponents service connection point on pool.
+objectclass: classSchema
+governsID: 1.2.840.113556.1.6.24.2.31
+#schemaIDGUID: {a7ed02b7-246b-47ff-8ed4-ff9d0bf3d60e}
+schemaIDGUID:: twLtp2sk/0eO1P+dC/PWDg==
+# Allows Full Control for Domain Admins and SYSTEM
+defaultSecurityDescriptor: D:(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;DA)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;SY)
+rdnattid: cn
+objectClassCategory: 1
+possSuperiors: container
+subClassOf: serviceConnectionPoint
+ldapDisplayName: msRTCSIP-WebComponentsService
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+dn: CN=ms-RTC-SIP-WebComponentsService,CN=Schema,CN=Configuration,DC=X
+changetype: modify
+add: mayContain
+mayContain: msRTCSIP-WebComponentsServers
+-
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+##############################################################
+# Trusted MCUs
+##############################################################
+
+dn: CN=ms-RTC-SIP-TrustedMCUs,CN=Schema,CN=Configuration,DC=X
+changetype: add
+adminDescription: msRTCSIP-TrustedMCUs
+adminDisplayName: msRTCSIP-TrustedMCUs
+description: Container to hold all trusted MCU objects.
+objectclass: classSchema
+governsID: 1.2.840.113556.1.6.24.2.32
+#schemaIDGUID: {d62e5d50-7bbb-42f9-85ea-ab04a69d517d}
+schemaIDGUID:: UF0u1rt7+UKF6qsEpp1RfQ==
+# Allows Full Control for Domain Admins and SYSTEM
+defaultSecurityDescriptor: D:(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;DA)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;SY)
+rdnattid: cn
+objectClassCategory: 1
+subClassOf: container
+possSuperiors: msRTCSIP-Service
+ldapDisplayName: msRTCSIP-TrustedMCUs
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+dn: CN=ms-RTC-SIP-TrustedMCUFQDN,CN=Schema,CN=Configuration,DC=X
+# This is the FQDN of one Trusted MCU
+changetype: add
+adminDescription: msRTCSIP-TrustedMCUFQDN
+adminDisplayName: msRTCSIP-TrustedMCUFQDN
+description: Trusted MCU FQDN.
+objectclass: attributeSchema
+attributeID: 1.2.840.113556.1.6.24.1.113
+#schemaIDGUID: {c6f63d53-3c3d-472a-b7bd-1ad732cc1105}
+schemaIDGUID:: Uz32xj08Kke3vRrXMswRBQ==
+oMSyntax: 64
+attributeSyntax: 2.5.5.12
+isSingleValued: TRUE
+searchFlags: 0
+isMemberOfPartialAttributeSet: FALSE
+ldapDisplayName: msRTCSIP-TrustedMCUFQDN
+
+
+dn: CN=ms-RTC-SIP-TrustedMCUData,CN=Schema,CN=Configuration,DC=X
+#This attribute will contain Name=Value pairs as separate strings.
+changetype: add
+adminDescription: msRTCSIP-TrustedMCUData
+adminDisplayName: msRTCSIP-TrustedMCUData
+description: This attribute is reserved for future use.
+objectclass: attributeSchema
+attributeID: 1.2.840.113556.1.6.24.1.114
+#schemaIDGUID: {78bf40f1-6492-406e-9e75-616b6b14c653}
+schemaIDGUID:: 8UC/eJJkbkCedWFraxTGUw==
+oMSyntax: 64
+attributeSyntax: 2.5.5.12
+isSingleValued: FALSE
+searchFlags: 0
+isMemberOfPartialAttributeSet: FALSE
+ldapDisplayName: msRTCSIP-TrustedMCUData
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+dn: CN=ms-RTC-SIP-TrustedMCU,CN=Schema,CN=Configuration,DC=X
+changetype: add
+adminDescription: msRTCSIP-TrustedMCU
+adminDisplayName: msRTCSIP-TrustedMCU
+description: The actual trusted MCU object.
+objectclass: classSchema
+governsID: 1.2.840.113556.1.6.24.2.33
+#schemaIDGUID: {066eea9e-43c0-4f07-bb0e-7130e5443bb3}
+schemaIDGUID:: nupuBsBDB0+7DnEw5UQ7sw==
+# Allows Full Control for Domain Admins and SYSTEM
+defaultSecurityDescriptor: D:(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;DA)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;SY)
+rdnattid: cn
+objectClassCategory: 1
+subClassOf: container
+possSuperiors: msRTCSIP-TrustedMCUs
+ldapDisplayName: msRTCSIP-TrustedMCU
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+dn: CN=ms-RTC-SIP-TrustedMCU,CN=Schema,CN=Configuration,DC=X
+changetype: modify
+add: mayContain
+mayContain: msRTCSIP-TrustedMCUFQDN
+-
+
+dn: CN=ms-RTC-SIP-TrustedMCU,CN=Schema,CN=Configuration,DC=X
+changetype: modify
+add: mayContain
+mayContain: msRTCSIP-MCUVendor
+-
+
+dn: CN=ms-RTC-SIP-TrustedMCU,CN=Schema,CN=Configuration,DC=X
+changetype: modify
+add: mayContain
+mayContain: msRTCSIP-MCUType
+-
+
+dn: CN=ms-RTC-SIP-TrustedMCU,CN=Schema,CN=Configuration,DC=X
+changetype: modify
+add: mayContain
+mayContain: msRTCSIP-TrustedMCUData
+-
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+##############################################################
+# Trusted WebComponentsServers
+##############################################################
+
+dn: CN=ms-RTC-SIP-TrustedWebComponentsServers,CN=Schema,CN=Configuration,DC=X
+changetype: add
+adminDescription: msRTCSIP-TrustedWebComponentsServers
+adminDisplayName: msRTCSIP-TrustedWebComponentsServers
+description: Container to hold all trusted WebComponents Server objects.
+objectclass: classSchema
+governsID: 1.2.840.113556.1.6.24.2.34
+#schemaIDGUID: {19506164-9b95-46c6-a11c-fb793351b642}
+schemaIDGUID:: ZGFQGZWbxkahHPt5M1G2Qg==
+# Allows Full Control for Domain Admins and SYSTEM
+defaultSecurityDescriptor: D:(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;DA)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;SY)
+rdnattid: cn
+objectClassCategory: 1
+subClassOf: container
+possSuperiors: msRTCSIP-Service
+ldapDisplayName: msRTCSIP-TrustedWebComponentsServers
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+dn: CN=ms-RTC-SIP-TrustedWebComponentsServerFQDN,CN=Schema,CN=Configuration,DC=X
+# This is the FQDN of one Trusted WebComponentsServer
+changetype: add
+adminDescription: msRTCSIP-TrustedWebComponentsServerFQDN
+adminDisplayName: msRTCSIP-TrustedWebComponentsServerFQDN
+description: Trusted WebComponents Server FQDN.
+objectclass: attributeSchema
+attributeID: 1.2.840.113556.1.6.24.1.115
+#schemaIDGUID: {d8de6d90-9e65-4401-8174-1020428136de}
+schemaIDGUID:: kG3e2GWeAUSBdBAgQoE23g==
+oMSyntax: 64
+attributeSyntax: 2.5.5.12
+isSingleValued: TRUE
+searchFlags: 0
+isMemberOfPartialAttributeSet: FALSE
+ldapDisplayName: msRTCSIP-TrustedWebComponentsServerFQDN
+
+
+dn: CN=ms-RTC-SIP-TrustedWebComponentsServerData,CN=Schema,CN=Configuration,DC=X
+#This attribute will contain Name=Value pairs as separate strings.
+changetype: add
+adminDescription: msRTCSIP-TrustedWebComponentsServerData
+adminDisplayName: msRTCSIP-TrustedWebComponentsServerData
+description: This attribute is reserved for future use.
+objectclass: attributeSchema
+attributeID: 1.2.840.113556.1.6.24.1.116
+#schemaIDGUID: {7584e7ab-a437-4d66-af32-0826dace1965}
+schemaIDGUID:: q+eEdTekZk2vMggm2s4ZZQ==
+oMSyntax: 64
+attributeSyntax: 2.5.5.12
+isSingleValued: FALSE
+searchFlags: 0
+isMemberOfPartialAttributeSet: FALSE
+ldapDisplayName: msRTCSIP-TrustedWebComponentsServerData
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+dn: CN=ms-RTC-SIP-TrustedWebComponentsServer,CN=Schema,CN=Configuration,DC=X
+changetype: add
+adminDescription: msRTCSIP-TrustedWebComponentsServer
+adminDisplayName: msRTCSIP-TrustedWebComponentsServer
+description: The actual trusted WebComponents Server object.
+objectclass: classSchema
+governsID: 1.2.840.113556.1.6.24.2.35
+#schemaIDGUID: {9ac58203-af89-4adb-badd-2815913a73b0}
+schemaIDGUID:: A4LFmomv20q63SgVkTpzsA==
+# Allows Full Control for Domain Admins and SYSTEM
+defaultSecurityDescriptor: D:(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;DA)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;SY)
+rdnattid: cn
+objectClassCategory: 1
+subClassOf: container
+possSuperiors: msRTCSIP-TrustedWebComponentsServers
+ldapDisplayName: msRTCSIP-TrustedWebComponentsServer
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+dn: CN=ms-RTC-SIP-TrustedWebComponentsServer,CN=Schema,CN=Configuration,DC=X
+changetype: modify
+add: mayContain
+mayContain: msRTCSIP-TrustedWebComponentsServerFQDN
+-
+
+dn: CN=ms-RTC-SIP-TrustedWebComponentsServer,CN=Schema,CN=Configuration,DC=X
+changetype: modify
+add: mayContain
+mayContain: msRTCSIP-TrustedWebComponentsServerData
+-
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+##############################################################
+# MCU factory provider ID (guid)
+##############################################################
+dn: CN=ms-RTC-SIP-MCUFactoryProviderID,CN=Schema,CN=Configuration,DC=X
+changetype: add
+adminDescription: msRTCSIP-MCUFactoryProviderID
+adminDisplayName: msRTCSIP-MCUFactoryProviderID
+description: ID of a MCU factory provider.
+objectclass: attributeSchema
+attributeID: 1.2.840.113556.1.6.24.1.118
+#schemaIDGUID: {57121677-1ee8-48ac-9ec7-32e97f4284f9}
+schemaIDGUID:: dxYSV+gerEiexzLpf0KE+Q==
+oMSyntax: 4
+attributeSyntax: 2.5.5.10
+isSingleValued: TRUE
+searchFlags: 0
+isMemberOfPartialAttributeSet: FALSE
+ldapDisplayName: msRTCSIP-MCUFactoryProviderID
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+dn: CN=ms-RTC-SIP-MCUFactory,CN=Schema,CN=Configuration,DC=X
+changetype: modify
+add: mayContain
+mayContain: msRTCSIP-MCUFactoryProviderID
+-
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+##############################################################
+# Domain FQDN on pool object.
+##############################################################
+dn: CN=ms-RTC-SIP-PoolDomainFQDN,CN=Schema,CN=Configuration,DC=X
+changetype: add
+adminDescription: msRTCSIP-PoolDomainFQDN
+adminDisplayName: msRTCSIP-PoolDomainFQDN
+description: This attribute defines the domain FQDN of a pool.
+objectclass: attributeSchema
+attributeID: 1.2.840.113556.1.6.24.1.119
+#schemaIDGUID: {a804825c-540a-45c8-8ea2-18516a5c2e51}
+schemaIDGUID:: XIIEqApUyEWOohhRalwuUQ==
+oMSyntax: 64
+attributeSyntax: 2.5.5.12
+isSingleValued: TRUE
+searchFlags: 0
+isMemberOfPartialAttributeSet: FALSE
+ldapDisplayName: msRTCSIP-PoolDomainFQDN
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+dn: CN=ms-RTC-SIP-Pool,CN=Schema,CN=Configuration,DC=X
+changetype: modify
+add: mayContain
+mayContain: msRTCSIP-PoolDomainFQDN
+-
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+##############################################################
+# Making msRTCSIP-OriginatorSid indexed and GCed
+##############################################################
+dn: CN=ms-RTC-SIP-OriginatorSid,CN=Schema,CN=Configuration,DC=X
+changetype: modify
+replace:searchFlags
+searchFlags: 9
+-
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+dn: CN=ms-RTC-SIP-OriginatorSid,CN=Schema,CN=Configuration,DC=X
+changetype: modify
+replace:isMemberOfPartialAttributeSet
+isMemberOfPartialAttributeSet: TRUE
+-
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+##############################################################
+# Adding msRTCSIP-TrustedServerVersion to trusted MCU and truste web component class
+##############################################################
+
+dn: CN=ms-RTC-SIP-TrustedMCU,CN=Schema,CN=Configuration,DC=X
+changetype: modify
+add: mayContain
+mayContain: msRTCSIP-TrustedServerVersion
+-
+
+dn: CN=ms-RTC-SIP-TrustedWebComponentsServer,CN=Schema,CN=Configuration,DC=X
+changetype: modify
+add: mayContain
+mayContain: msRTCSIP-TrustedServerVersion
+-
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+##############################################################
+# Trusted Proxys
+##############################################################
+
+dn: CN=ms-RTC-SIP-TrustedProxies,CN=Schema,CN=Configuration,DC=X
+changetype: add
+adminDescription: msRTCSIP-TrustedProxies
+adminDisplayName: msRTCSIP-TrustedProxies
+description: Container to hold all trusted proxy objects.
+objectclass: classSchema
+governsID: 1.2.840.113556.1.6.24.2.41
+#schemaIDGUID: {61324a3b-fb6e-4407-bea7-4535fd5f8a98}
+schemaIDGUID:: O0oyYW77B0S+p0U1/V+KmA==
+# Allows Full Control for Domain Admins and SYSTEM
+defaultSecurityDescriptor: D:(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;DA)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;SY)
+rdnattid: cn
+objectClassCategory: 1
+subClassOf: container
+possSuperiors: msRTCSIP-Service
+ldapDisplayName: msRTCSIP-TrustedProxies
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+dn: CN=ms-RTC-SIP-TrustedProxyFQDN,CN=Schema,CN=Configuration,DC=X
+# This is the FQDN of one trusted proxy
+changetype: add
+adminDescription: msRTCSIP-TrustedProxyFQDN
+adminDisplayName: msRTCSIP-TrustedProxyFQDN
+description: Trusted proxy FQDN.
+objectclass: attributeSchema
+attributeID: 1.2.840.113556.1.6.24.1.130
+#schemaIDGUID: {79229c11-0a43-4258-b563-eb009fe89c87}
+schemaIDGUID:: EZwieUMKWEK1Y+sAn+ichw==
+oMSyntax: 64
+attributeSyntax: 2.5.5.12
+isSingleValued: TRUE
+searchFlags: 0
+isMemberOfPartialAttributeSet: FALSE
+ldapDisplayName: msRTCSIP-TrustedProxyFQDN
+
+
+dn: CN=ms-RTC-SIP-TrustedProxyData,CN=Schema,CN=Configuration,DC=X
+#This attribute will contain Name=Value pairs as separate strings.
+changetype: add
+adminDescription: msRTCSIP-TrustedProxyData
+adminDisplayName: msRTCSIP-TrustedProxyData
+description: This attribute is reserved for future use.
+objectclass: attributeSchema
+attributeID: 1.2.840.113556.1.6.24.1.131
+#schemaIDGUID: {62d53bce-b8dd-4cf1-ac04-d02c0925d12c}
+schemaIDGUID:: zjvVYt248UysBNAsCSXRLA==
+oMSyntax: 64
+attributeSyntax: 2.5.5.12
+isSingleValued: FALSE
+searchFlags: 0
+isMemberOfPartialAttributeSet: FALSE
+ldapDisplayName: msRTCSIP-TrustedProxyData
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+dn: CN=ms-RTC-SIP-TrustedProxy,CN=Schema,CN=Configuration,DC=X
+changetype: add
+adminDescription: msRTCSIP-TrustedProxy
+adminDisplayName: msRTCSIP-TrustedProxy
+description: The actual trusted proxy object.
+objectclass: classSchema
+governsID: 1.2.840.113556.1.6.24.2.42
+#schemaIDGUID: {2648a3db-5ccb-4fbe-bbdb-5125dac99bf7}
+schemaIDGUID:: 26NIJstcvk+721El2smb9w==
+# Allows Full Control for Domain Admins and SYSTEM
+defaultSecurityDescriptor: D:(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;DA)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;SY)
+rdnattid: cn
+objectClassCategory: 1
+subClassOf: container
+possSuperiors: msRTCSIP-TrustedProxies
+ldapDisplayName: msRTCSIP-TrustedProxy
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+dn: CN=ms-RTC-SIP-TrustedProxy,CN=Schema,CN=Configuration,DC=X
+changetype: modify
+add: mayContain
+mayContain: msRTCSIP-TrustedProxyFQDN
+-
+
+dn: CN=ms-RTC-SIP-TrustedProxy,CN=Schema,CN=Configuration,DC=X
+changetype: modify
+add: mayContain
+mayContain: msRTCSIP-TrustedProxyData
+-
+
+dn: CN=ms-RTC-SIP-TrustedProxy,CN=Schema,CN=Configuration,DC=X
+changetype: modify
+add: mayContain
+mayContain: msRTCSIP-TrustedServerVersion
+-
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+##############################################################
+# Add user policy DN attribute (DN with binary type)
+##############################################################
+dn: CN=ms-RTC-SIP-UserPolicy,CN=Schema,CN=Configuration,DC=X
+changetype: add
+adminDescription: msRTCSIP-UserPolicy
+adminDisplayName: msRTCSIP-UserPolicy
+description: This attribute contain multiple DNs that point to global user policy objects.
+objectclass: attributeSchema
+attributeID: 1.2.840.113556.1.6.24.1.132
+#schemaIDGUID: {617d2d96-2d5c-4d76-af22-32feed1d8f71}
+schemaIDGUID:: li19YVwtdk2vIjL+7R2PcQ==
+oMSyntax: 127
+attributeSyntax: 2.5.5.7
+isSingleValued: FALSE
+searchFlags: 0
+omObjectClass:: KoZIhvcUAQEBCw==
+isMemberOfPartialAttributeSet: TRUE
+ldapDisplayName: msRTCSIP-UserPolicy
+#Base 64 Encoded GUID of :D819615A3B9B4738B47EF1BD8EE3AEA4
+attributeSecurityGUID:: WmEZ2Js7OEe0fvG9juOupA==
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+dn: CN=User,CN=Schema,CN=Configuration,DC=X
+changetype: modify
+add: mayContain
+mayContain: msRTCSIP-UserPolicy
+-
+
+dn: CN=Contact,CN=Schema,CN=Configuration,DC=X
+# NT Contact Data
+changetype: modify
+add: mayContain
+mayContain: msRTCSIP-UserPolicy
+-
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+##############################################################
+# msRTCSIP-Default is a boolean attribute indicating whether
+# a global setting object is the default instance in a global
+# container.
+##############################################################
+
+dn: CN=ms-RTC-SIP-Default,CN=Schema,CN=Configuration,DC=X
+changetype: add
+adminDescription: msRTCSIP-Default
+adminDisplayName: msRTCSIP-Default
+description: Indicate whether a global setting object is default or not.
+objectclass: attributeSchema
+attributeID: 1.2.840.113556.1.6.24.1.169
+#schemaIDGUID: {b4f3d9af-626c-41b5-a073-61cc1c2046a6}
+schemaIDGUID:: r9nztGxitUGgc2HMHCBGpg==
+oMSyntax: 1
+attributeSyntax: 2.5.5.8
+isSingleValued: TRUE
+searchFlags: 0
+isMemberOfPartialAttributeSet: FALSE
+ldapDisplayName: msRTCSIP-Default
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+##############################################################
+# Create trusted services container class
+##############################################################
+dn: CN=ms-RTC-SIP-TrustedServices,CN=Schema,CN=Configuration,DC=X
+changetype: add
+adminDescription: msRTCSIP-TrustedServices
+adminDisplayName: msRTCSIP-TrustedServices
+description: Container to hold all trusted service objects.
+objectclass: classSchema
+governsID: 1.2.840.113556.1.6.24.2.58
+#schemaIDGUID: {6E05D453-D2FE-4349-9BD5-331BD6959E39}
+schemaIDGUID:: U9QFbv7SSUOb1TMb1pWeOQ==
+# Allows Full Control for Domain Admins and SYSTEM
+defaultSecurityDescriptor: D:(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;DA)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;SY)
+rdnattid: cn
+objectClassCategory: 1
+subClassOf: container
+possSuperiors: msRTCSIP-Service
+ldapDisplayName: msRTCSIP-TrustedServices
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+#####################################################################
+# Create trusted service class. Unlike msRTCSIP-TrustedServer
+# that identifies a trusted machine by a FQDN, msRTCSIP-TrustedService
+# identifies a trusted service using 3-tuples (HostMachineFQDN,
+# ListeningPort, ServiceType)
+#####################################################################
+dn: CN=ms-RTC-SIP-TrustedService,CN=Schema,CN=Configuration,DC=X
+changetype: add
+adminDescription: msRTCSIP-TrustedService
+adminDisplayName: msRTCSIP-TrustedService
+description: Stores data about trusted services.
+objectclass: classSchema
+governsID: 1.2.840.113556.1.6.24.2.59
+#schemaIDGUID: {8169ca96-82c5-4ece-bc33-e056b00a120a}
+schemaIDGUID:: lsppgcWCzk68M+BWsAoSCg==
+# Allows Full Control for Domain Admins and SYSTEM
+defaultSecurityDescriptor: D:(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;DA)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;SY)
+rdnattid: cn
+objectClassCategory: 1
+possSuperiors: msRTCSIP-TrustedServices
+subClassOf: container
+ldapDisplayName: msRTCSIP-TrustedService
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+#####################################################################
+# Create trusted service attributes
+#####################################################################
+dn: CN=ms-RTC-SIP-TrustedServicePort,CN=Schema,CN=Configuration,DC=X
+# This is the listening port of a trusted service
+changetype: add
+adminDescription: msRTCSIP-TrustedServicePort
+adminDisplayName: msRTCSIP-TrustedServicePort
+description: Trusted Service Listening Port
+objectclass: attributeSchema
+attributeID: 1.2.840.113556.1.6.24.1.170
+#schemaIDGUID: {28c7dcdb-e72f-4a53-bcbe-ecdc80859e2a}
+schemaIDGUID:: 29zHKC/nU0q8vuzcgIWeKg==
+oMSyntax: 2
+attributeSyntax: 2.5.5.9
+isSingleValued: TRUE
+searchFlags: 0
+isMemberOfPartialAttributeSet: FALSE
+ldapDisplayName: msRTCSIP-TrustedServicePort
+
+dn: CN=ms-RTC-SIP-TrustedServiceType,CN=Schema,CN=Configuration,DC=X
+# This is the type of a trusted service
+changetype: add
+adminDescription: msRTCSIP-TrustedServiceType
+adminDisplayName: msRTCSIP-TrustedServiceType
+description: Trusted Service Type.
+objectclass: attributeSchema
+attributeID: 1.2.840.113556.1.6.24.1.171
+#schemaIDGUID: {ee78b91c-6fd0-45a7-b5d7-3c48c6695b60}
+schemaIDGUID:: HLl47tBvp0W11zxIxmlbYA==
+oMSyntax: 64
+attributeSyntax: 2.5.5.12
+isSingleValued: TRUE
+searchFlags: 0
+isMemberOfPartialAttributeSet: FALSE
+ldapDisplayName: msRTCSIP-TrustedServiceType
+
+dn: CN=ms-RTC-SIP-Routable,CN=Schema,CN=Configuration,DC=X
+# Determine whether a trusted service can be used for authorization or routing
+changetype: add
+adminDescription: msRTCSIP-Routable
+adminDisplayName: msRTCSIP-Routable
+description: Determine whether a trusted service can be used for authorization or routing
+objectclass: attributeSchema
+attributeID: 1.2.840.113556.1.6.24.1.172
+#schemaIDGUID: {a647962b-044a-4784-b6bd-486b25bc8585}
+schemaIDGUID:: K5ZHpkoEhEe2vUhrJbyFhQ==
+oMSyntax: 1
+attributeSyntax: 2.5.5.8
+isSingleValued: TRUE
+searchFlags: 0
+isMemberOfPartialAttributeSet: FALSE
+ldapDisplayName: msRTCSIP-Routable
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+#####################################################################
+# Create linked attributes that connect a TrustedService with one or more Pools
+# or Mediation Servers
+#####################################################################
+dn: CN=ms-RTC-SIP-TrustedServiceLinks,CN=Schema,CN=Configuration,DC=X
+changetype: add
+adminDescription: msRTCSIP-TrustedServiceLinks
+adminDisplayName: msRTCSIP-TrustedServiceLinks
+description: This attribute contain multiple ordered DNs that point to trusted service objects.
+objectclass: attributeSchema
+attributeID: 1.2.840.113556.1.6.24.1.173
+#schemaIDGUID: {689d5375-98fa-4dbb-9d5e-41d8215311d2}
+schemaIDGUID:: dVOdaPqYu02dXkHYIVMR0g==
+oMSyntax: 127
+attributeSyntax: 2.5.5.7
+linkID: 11030
+isSingleValued: FALSE
+searchFlags: 3
+omObjectClass:: KoZIhvcUAQEBCw==
+isMemberOfPartialAttributeSet: TRUE
+ldapDisplayName: msRTCSIP-TrustedServiceLinks
+
+dn: CN=ms-RTC-SIP-ServerBL,CN=Schema,CN=Configuration,DC=X
+changetype: add
+adminDescription: msRTCSIP-ServerBL
+adminDisplayName: msRTCSIP-ServerBL
+description: This attribute contain a list of pool or server objects that the service serves.
+objectclass: attributeSchema
+attributeID: 1.2.840.113556.1.6.24.1.174
+#schemaIDGUID: {4735c740-94bb-4c8e-a4df-68237a5a99b9}
+schemaIDGUID:: QMc1R7uUjkyk32gjelqZuQ==
+oMSyntax: 127
+attributeSyntax: 2.5.5.1
+linkID: 11031
+isSingleValued: FALSE
+searchFlags: 0
+isMemberOfPartialAttributeSet: TRUE
+ldapDisplayName: msRTCSIP-ServerBL
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+#####################################################################
+# Trusted service attributes
+#####################################################################
+dn: CN=ms-RTC-SIP-TrustedService,CN=Schema,CN=Configuration,DC=X
+changetype: modify
+add: mayContain
+mayContain: msRTCSIP-TrustedServerFQDN
+-
+
+dn: CN=ms-RTC-SIP-TrustedService,CN=Schema,CN=Configuration,DC=X
+changetype: modify
+add: mayContain
+mayContain: msRTCSIP-TrustedServicePort
+-
+
+dn: CN=ms-RTC-SIP-TrustedService,CN=Schema,CN=Configuration,DC=X
+changetype: modify
+add: mayContain
+mayContain: msRTCSIP-TrustedServiceType
+-
+
+dn: CN=ms-RTC-SIP-TrustedService,CN=Schema,CN=Configuration,DC=X
+changetype: modify
+add: mayContain
+mayContain: msRTCSIP-TrustedServerVersion
+-
+
+dn: CN=ms-RTC-SIP-TrustedService,CN=Schema,CN=Configuration,DC=X
+changetype: modify
+add: mayContain
+mayContain: msRTCSIP-Routable
+-
+
+dn: CN=ms-RTC-SIP-TrustedService,CN=Schema,CN=Configuration,DC=X
+changetype: modify
+add: mayContain
+mayContain: msRTCSIP-ServerBL
+-
+
+dn: CN=ms-RTC-SIP-TrustedService,CN=Schema,CN=Configuration,DC=X
+changetype: modify
+add: mayContain
+mayContain: msRTCSIP-ExtensionData
+-
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+#####################################################################
+# Mediation server attributes
+#####################################################################
+dn: CN=ms-RTC-SIP-EnterpriseMediationServerSettings,CN=Schema,CN=Configuration,DC=X
+changetype: modify
+add: mayContain
+mayContain: msRTCSIP-TrustedServiceLinks
+-
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+#####################################################################
+# Add two foward link attributes to pool
+#####################################################################
+dn: CN=ms-RTC-SIP-Pool,CN=Schema,CN=Configuration,DC=X
+changetype: modify
+add: mayContain
+mayContain: msRTCSIP-TrustedServiceLinks
+-
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+#####################################################################
+# Apply default to domain
+#####################################################################
+dn: CN=ms-RTC-SIP-Domain,CN=Schema,CN=Configuration,DC=X
+changetype: modify
+add: mayContain
+mayContain: msRTCSIP-Default
+-
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+##############################################################
+# Replicate msRTCSIP-TrustedServiceType to GC in order to
+# support GC query based on the attribute
+##############################################################
+
+dn: CN=ms-RTC-SIP-TrustedServiceType,CN=Schema,CN=Configuration,DC=X
+changetype: modify
+replace:isMemberOfPartialAttributeSet
+isMemberOfPartialAttributeSet: TRUE
+-
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+##############################################################
+#
+# OCS 2008 schema change start from here
+#
+##############################################################
+
+dn: CN=ms-RTC-SIP-ApplicationDestination,CN=Schema,CN=Configuration,DC=X
+changetype: add
+adminDescription: msRTCSIP-ApplicationDestination
+adminDisplayName: msRTCSIP-ApplicationDestination
+description: This attribute points to the trusted service entry for the application contact
+objectclass: attributeSchema
+attributeID: 1.2.840.113556.1.6.24.1.177
+#schemaIDGUID: {FFE7CD03-EDBF-4675-9B18-85ABE24D8DC5}
+schemaIDGUID:: A83n/7/tdUabGIWr4k2NxQ==
+oMSyntax: 127
+attributeSyntax: 2.5.5.1
+isSingleValued: FALSE
+searchFlags: 3
+isMemberOfPartialAttributeSet: TRUE
+ldapDisplayName: msRTCSIP-ApplicationDestination
+#Base 64 Encoded GUID of :D819615A3B9B4738B47EF1BD8EE3AEA4
+attributeSecurityGUID:: WmEZ2Js7OEe0fvG9juOupA==
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+dn: CN=Contact,CN=Schema,CN=Configuration,DC=X
+# NT Contact Data
+changetype: modify
+add: mayContain
+mayContain: msRTCSIP-ApplicationDestination
+-
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+##############################################################
+# Application Server Schema Entries
+##############################################################
+dn: CN=ms-RTC-SIP-ApplicationList,CN=Schema,CN=Configuration,DC=X
+changetype: add
+adminDescription: msRTCSIP-ApplicationList
+adminDisplayName: msRTCSIP-ApplicationList
+description: This attribute contains types of hosted applications.
+objectclass: attributeSchema
+attributeID: 1.2.840.113556.1.6.24.1.179
+#schemaIDGUID: {82A97E97-1A8D-4D30-8854-929A993D1718}
+schemaIDGUID:: l36pgo0aME2IVJKamT0XGA==
+oMSyntax: 64
+attributeSyntax: 2.5.5.12
+isSingleValued: FALSE
+searchFlags: 0
+isMemberOfPartialAttributeSet: FALSE
+ldapDisplayName: msRTCSIP-ApplicationList
+
+dn: CN=ms-RTC-SIP-ApplicationServerService,CN=Schema,CN=Configuration,DC=X
+changetype: add
+adminDescription: msRTCSIP-ApplicationServerService
+adminDisplayName: msRTCSIP-ApplicationServerService
+description: Application Server service connection point on pool.
+objectclass: classSchema
+governsID: 1.2.840.113556.1.6.24.2.62
+#schemaIDGUID: {36B46622-D062-4165-9656-4A7E2E7B0B04}
+schemaIDGUID:: Ima0NmLQZUGWVkp+LnsLBA==
+# Allows Full Control for Domain Admins and SYSTEM
+defaultSecurityDescriptor: D:(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;DA)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;SY)
+rdnattid: cn
+objectClassCategory: 1
+possSuperiors: container
+subClassOf: serviceConnectionPoint
+ldapDisplayName: msRTCSIP-ApplicationServerService
+
+dn: CN=ms-RTC-SIP-ApplicationServerPoolLink,CN=Schema,CN=Configuration,DC=X
+changetype: add
+adminDescription: msRTCSIP-ApplicationServerPoolLink
+adminDisplayName: msRTCSIP-ApplicationServerPoolLink
+description: This attribute points to the pool that this Application Server belongs to.
+objectclass: attributeSchema
+attributeID: 1.2.840.113556.1.6.24.1.180
+#schemaIDGUID: {21A52731-964B-4B0C-AEEC-629D811BF231}
+schemaIDGUID:: MSelIUuWDEuu7GKdgRvyMQ==
+oMSyntax: 127
+attributeSyntax: 2.5.5.1
+linkID: 11038
+isSingleValued: TRUE
+searchFlags: 3
+isMemberOfPartialAttributeSet: TRUE
+ldapDisplayName: msRTCSIP-ApplicationServerPoolLink
+
+dn: CN=ms-RTC-SIP-ApplicationServerBL,CN=Schema,CN=Configuration,DC=X
+changetype: add
+adminDescription: msRTCSIP-ApplicationServerBL
+adminDisplayName: msRTCSIP-ApplicationServerBL
+description: This attribute contain a list of Application Servers that belong to this pool.
+objectclass: attributeSchema
+attributeID: 1.2.840.113556.1.6.24.1.181
+#schemaIDGUID: {36698488-ADFA-4ED2-8EA1-DA8AF40D6D1A}
+schemaIDGUID:: iIRpNvqt0k6OodqK9A1tGg==
+oMSyntax: 127
+attributeSyntax: 2.5.5.1
+linkID: 11039
+isSingleValued: FALSE
+searchFlags: 0
+isMemberOfPartialAttributeSet: TRUE
+ldapDisplayName: msRTCSIP-ApplicationServerBL
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+dn: CN=ms-RTC-SIP-ApplicationServerService,CN=Schema,CN=Configuration,DC=X
+changetype: modify
+add: mayContain
+mayContain: msRTCSIP-ApplicationServerBL
+-
+
+dn: CN=ms-RTC-SIP-ApplicationServerSettings,CN=Schema,CN=Configuration,DC=X
+changetype: modify
+add: mayContain
+mayContain: msRTCSIP-ServerVersion
+-
+
+dn: CN=ms-RTC-SIP-ApplicationServerSettings,CN=Schema,CN=Configuration,DC=X
+changetype: modify
+add: mayContain
+mayContain: msRTCSIP-ExtensionData
+-
+
+dn: CN=ms-RTC-SIP-ApplicationServerSettings,CN=Schema,CN=Configuration,DC=X
+changetype: modify
+add: mayContain
+mayContain: msRTCSIP-ApplicationServerPoolLink
+-
+
+dn: CN=ms-RTC-SIP-ApplicationServerSettings,CN=Schema,CN=Configuration,DC=X
+changetype: modify
+add: mayContain
+mayContain: msRTCSIP-ApplicationList
+-
+
+dn: CN=ms-RTC-SIP-Pool,CN=Schema,CN=Configuration,DC=X
+changetype: modify
+add: mayContain
+mayContain: msRTCSIP-ApplicationList
+-
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+##############################################################
+# Create application contacts container class
+##############################################################
+dn: CN=ms-RTC-SIP-ApplicationContacts,CN=Schema,CN=Configuration,DC=X
+changetype: add
+adminDescription: msRTCSIP-ApplicationContacts
+adminDisplayName: msRTCSIP-ApplicationContacts
+description: Container to hold application contact objects.
+objectclass: classSchema
+governsID: 1.2.840.113556.1.6.24.2.65
+#schemaIDGUID: {6997D68B-4EBF-4B04-89CC-AB5FE3D7F304}
+schemaIDGUID:: i9aXab9OBEuJzKtf49fzBA==
+# Allows Full Control for Domain Admins and SYSTEM
+defaultSecurityDescriptor: D:(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;DA)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;SY)
+rdnattid: cn
+objectClassCategory: 1
+subClassOf: container
+possSuperiors: msRTCSIP-Service
+ldapDisplayName: msRTCSIP-ApplicationContacts
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+##############################################################
+# Add per-user location profile
+##############################################################
+
+dn: CN=ms-RTC-SIP-UserLocationProfile,CN=Schema,CN=Configuration,DC=X
+changetype: add
+adminDescription: msRTCSIP-UserLocationProfile
+adminDisplayName: msRTCSIP-UserLocationProfile
+description: This attribute contain DN that points to a location profile object.
+objectclass: attributeSchema
+attributeID: 1.2.840.113556.1.6.24.1.182
+#schemaIDGUID: {8D7B5B13-2A33-4E25-9B64-DBC4AD67994E}
+schemaIDGUID:: E1t7jTMqJU6bZNvErWeZTg==
+oMSyntax: 127
+attributeSyntax: 2.5.5.1
+isSingleValued: TRUE
+searchFlags: 1
+isMemberOfPartialAttributeSet: TRUE
+ldapDisplayName: msRTCSIP-UserLocationProfile
+#Base 64 Encoded GUID of :D819615A3B9B4738B47EF1BD8EE3AEA4
+attributeSecurityGUID:: WmEZ2Js7OEe0fvG9juOupA==
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+dn: CN=User,CN=Schema,CN=Configuration,DC=X
+changetype: modify
+add: mayContain
+mayContain: msRTCSIP-UserLocationProfile
+-
+
+dn: CN=Contact,CN=Schema,CN=Configuration,DC=X
+# NT Contact Data
+changetype: modify
+add: mayContain
+mayContain: msRTCSIP-UserLocationProfile
+-
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+##############################################################
+# Add CAA contact-location mapping
+##############################################################
+
+dn: CN=ms-RTC-SIP-LocationContactMappings,CN=Schema,CN=Configuration,DC=X
+changetype: add
+adminDescription: msRTCSIP-LocationContactMappings
+adminDisplayName: msRTCSIP-LocationContactMappings
+description: Container to hold contact-location mapping objects.
+objectclass: classSchema
+governsID: 1.2.840.113556.1.6.24.2.66
+#schemaIDGUID: {A33FE8AD-6D42-4C88-B0D8-14BDE8578365}
+schemaIDGUID:: reg/o0JtiEyw2BS96FeDZQ==
+# Allows Full Control for Domain Admins and SYSTEM
+defaultSecurityDescriptor: D:(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;DA)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;SY)
+rdnattid: cn
+objectClassCategory: 1
+subClassOf: container
+possSuperiors: msRTCSIP-Service
+ldapDisplayName: msRTCSIP-LocationContactMappings
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+dn: CN=ms-RTC-SIP-LocationContactMapping,CN=Schema,CN=Configuration,DC=X
+changetype: add
+adminDescription: msRTCSIP-LocationContactMapping
+adminDisplayName: msRTCSIP-LocationContactMapping
+description: Stores data about trusted services.
+objectclass: classSchema
+governsID: 1.2.840.113556.1.6.24.2.67
+#schemaIDGUID: {0C6D9A03-8804-4F57-AB15-A41845032E63}
+schemaIDGUID:: A5ptDASIV0+rFaQYRQMuYw==
+# Allows Full Control for Domain Admins and SYSTEM
+defaultSecurityDescriptor: D:(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;DA)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;SY)
+rdnattid: cn
+objectClassCategory: 1
+possSuperiors: msRTCSIP-LocationContactMappings
+subClassOf: container
+ldapDisplayName: msRTCSIP-LocationContactMapping
+
+dn: CN=ms-RTC-SIP-MappingContact,CN=Schema,CN=Configuration,DC=X
+changetype: add
+adminDescription: msRTCSIP-MappingContact
+adminDisplayName: msRTCSIP-MappingContact
+description: This attribute contains a list of application contacts.
+objectclass: attributeSchema
+attributeID: 1.2.840.113556.1.6.24.1.184
+#schemaIDGUID: {9A4DD8D4-74BE-443C-B759-3B03D5645802}
+schemaIDGUID:: 1NhNmr50PES3WTsD1WRYAg==
+oMSyntax: 127
+attributeSyntax: 2.5.5.1
+isSingleValued: FALSE
+searchFlags: 1
+isMemberOfPartialAttributeSet: FALSE
+ldapDisplayName: msRTCSIP-MappingContact
+
+dn: CN=ms-RTC-SIP-MappingLocation,CN=Schema,CN=Configuration,DC=X
+changetype: add
+adminDescription: msRTCSIP-MappingLocation
+adminDisplayName: msRTCSIP-MappingLocation
+description: This attribute contains a list of location profiles.
+objectclass: attributeSchema
+attributeID: 1.2.840.113556.1.6.24.1.185
+#schemaIDGUID: {040FB298-5FC8-4765-A3A4-4530B0E8EAB2}
+schemaIDGUID:: mLIPBMhfZUejpEUwsOjqsg==
+oMSyntax: 127
+attributeSyntax: 2.5.5.1
+isSingleValued: TRUE
+searchFlags: 1
+isMemberOfPartialAttributeSet: FALSE
+ldapDisplayName: msRTCSIP-MappingLocation
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+dn: CN=ms-RTC-SIP-LocationContactMapping,CN=Schema,CN=Configuration,DC=X
+changetype: modify
+add: mayContain
+mayContain: msRTCSIP-MappingContact
+-
+
+dn: CN=ms-RTC-SIP-LocationContactMapping,CN=Schema,CN=Configuration,DC=X
+changetype: modify
+add: mayContain
+mayContain: msRTCSIP-MappingLocation
+-
+
+dn: CN=ms-RTC-SIP-LocationContactMapping,CN=Schema,CN=Configuration,DC=X
+changetype: modify
+add: mayContain
+mayContain: msRTCSIP-ExtensionData
+-
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+##############################################################
+# Add location profile options and external access dial code
+##############################################################
+
+dn: CN=ms-RTC-SIP-LocationProfileOptions,CN=Schema,CN=Configuration,DC=X
+changetype: add
+adminDescription: msRTCSIP-LocationProfileOptions
+adminDisplayName: msRTCSIP-LocationProfileOptions
+description: This attribute indicate the options of the location profile
+objectclass: attributeSchema
+attributeID: 1.2.840.113556.1.6.24.1.186
+#schemaIDGUID: {99F9D08A-9319-4557-BC9E-29455418087B}
+schemaIDGUID:: itD5mRmTV0W8nilFVBgIew==
+oMSyntax: 2
+attributeSyntax: 2.5.5.9
+isSingleValued: TRUE
+searchFlags: 0
+isMemberOfPartialAttributeSet: FALSE
+ldapDisplayName: msRTCSIP-LocationProfileOptions
+
+dn: CN=ms-RTC-SIP-ExternalAccessCode,CN=Schema,CN=Configuration,DC=X
+changetype: add
+adminDescription: msRTCSIP-ExternalAccessCode
+adminDisplayName: msRTCSIP-ExternalAccessCode
+description: Dial code for external access.
+objectclass: attributeSchema
+attributeID: 1.2.840.113556.1.6.24.1.187
+#schemaIDGUID: {D63B4DC0-F005-4BF8-BF50-93FBB4A1A819}
+schemaIDGUID:: wE071gXw+Eu/UJP7tKGoGQ==
+oMSyntax: 64
+attributeSyntax: 2.5.5.12
+isSingleValued: TRUE
+searchFlags: 0
+isMemberOfPartialAttributeSet: FALSE
+ldapDisplayName: msRTCSIP-ExternalAccessCode
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+dn: CN=ms-RTC-SIP-LocationProfile,CN=Schema,CN=Configuration,DC=X
+changetype: modify
+add: mayContain
+mayContain: msRTCSIP-LocationProfileOptions
+-
+
+dn: CN=ms-RTC-SIP-LocationProfile,CN=Schema,CN=Configuration,DC=X
+changetype: modify
+add: mayContain
+mayContain: msRTCSIP-ExternalAccessCode
+-
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+##############################################################
+# Add normalization rule options
+##############################################################
+
+dn: CN=ms-RTC-SIP-LocalNormalizationOptions,CN=Schema,CN=Configuration,DC=X
+changetype: add
+adminDescription: msRTCSIP-LocalNormalizationOptions
+adminDisplayName: msRTCSIP-LocalNormalizationOptions
+description: This attribute indicate the options of the normalization rule.
+objectclass: attributeSchema
+attributeID: 1.2.840.113556.1.6.24.1.188
+#schemaIDGUID: {16638111-A1C1-4063-B6A8-9C1E7E2027C8}
+schemaIDGUID:: EYFjFsGhY0C2qJwefiAnyA==
+oMSyntax: 2
+attributeSyntax: 2.5.5.9
+isSingleValued: TRUE
+searchFlags: 0
+isMemberOfPartialAttributeSet: FALSE
+ldapDisplayName: msRTCSIP-LocalNormalizationOptions
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+dn: CN=ms-RTC-SIP-LocalNormalization,CN=Schema,CN=Configuration,DC=X
+changetype: modify
+add: mayContain
+mayContain: msRTCSIP-LocalNormalizationOptions
+-
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+##############################################################
+# Add conference directory container and object classes
+##############################################################
+dn: CN=ms-RTC-SIP-ConferenceDirectories,CN=Schema,CN=Configuration,DC=X
+changetype: add
+adminDescription: msRTCSIP-ConferenceDirectories
+adminDisplayName: msRTCSIP-ConferenceDirectories
+description: Container to hold conference directory objects.
+objectclass: classSchema
+governsID: 1.2.840.113556.1.6.24.2.68
+#schemaIDGUID: {F21C704E-7E95-44D4-89A6-C1AF18BA6BAC}
+schemaIDGUID:: TnAc8pV+1ESJpsGvGLprrA==
+# Allows Full Control for Domain Admins and SYSTEM
+defaultSecurityDescriptor: D:(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;DA)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;SY)
+rdnattid: cn
+objectClassCategory: 1
+subClassOf: container
+possSuperiors: msRTCSIP-Service
+ldapDisplayName: msRTCSIP-ConferenceDirectories
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+dn: CN=ms-RTC-SIP-ConferenceDirectory,CN=Schema,CN=Configuration,DC=X
+changetype: add
+adminDescription: msRTCSIP-ConferenceDirectory
+adminDisplayName: msRTCSIP-ConferenceDirectory
+description: Conference directory object.
+objectclass: classSchema
+governsID: 1.2.840.113556.1.6.24.2.69
+#schemaIDGUID: {03432B9A-EF8C-40D2-8B20-496D379F054E}
+schemaIDGUID:: mitDA4zv0kCLIEltN58FTg==
+# Allows Full Control for Domain Admins and SYSTEM
+defaultSecurityDescriptor: D:(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;DA)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;SY)
+rdnattid: cn
+objectClassCategory: 1
+subClassOf: container
+possSuperiors: msRTCSIP-ConferenceDirectories
+ldapDisplayName: msRTCSIP-ConferenceDirectory
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+dn: CN=ms-RTC-SIP-ConferenceDirectoryId,CN=Schema,CN=Configuration,DC=X
+changetype: add
+adminDescription: msRTCSIP-ConferenceDirectoryId
+adminDisplayName: msRTCSIP-ConferenceDirectoryId
+description: Id for conference directory object.
+objectclass: attributeSchema
+attributeID: 1.2.840.113556.1.6.24.1.191
+#schemaIDGUID: {8097E015-5FFB-4F49-93FF-FD29F700E8E1}
+schemaIDGUID:: FeCXgPtfSU+T//0p9wDo4Q==
+oMSyntax: 2
+attributeSyntax: 2.5.5.9
+isSingleValued: TRUE
+searchFlags: 0
+isMemberOfPartialAttributeSet: FALSE
+ldapDisplayName: msRTCSIP-ConferenceDirectoryId
+
+dn: CN=ms-RTC-SIP-ConferenceDirectoryHomePool,CN=Schema,CN=Configuration,DC=X
+changetype: add
+adminDescription: msRTCSIP-ConferenceDirectoryHomePool
+adminDisplayName: msRTCSIP-ConferenceDirectoryHomePool
+description: This attribute points to the pool that hosts the conference directory.
+objectclass: attributeSchema
+attributeID: 1.2.840.113556.1.6.24.1.192
+#schemaIDGUID: {58CCF485-A21B-4D42-BE49-E6C5AB4802F3}
+schemaIDGUID:: hfTMWBuiQk2+SebFq0gC8w==
+oMSyntax: 127
+attributeSyntax: 2.5.5.1
+isSingleValued: TRUE
+searchFlags: 1
+isMemberOfPartialAttributeSet: TRUE
+ldapDisplayName: msRTCSIP-ConferenceDirectoryHomePool
+
+dn: CN=ms-RTC-SIP-ConferenceDirectoryTargetPool,CN=Schema,CN=Configuration,DC=X
+changetype: add
+adminDescription: msRTCSIP-ConferenceDirectoryTargetPool
+adminDisplayName: msRTCSIP-ConferenceDirectoryTargetPool
+description: This attribute points to the pool to which the conference directory is being moved.
+objectclass: attributeSchema
+attributeID: 1.2.840.113556.1.6.24.1.193
+#schemaIDGUID: {CEFF1D77-697E-49F5-B44B-0134504D2E88}
+schemaIDGUID:: dx3/zn5p9Um0SwE0UE0uiA==
+oMSyntax: 127
+attributeSyntax: 2.5.5.1
+isSingleValued: TRUE
+searchFlags: 0
+isMemberOfPartialAttributeSet: FALSE
+ldapDisplayName: msRTCSIP-ConferenceDirectoryTargetPool
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+dn: CN=ms-RTC-SIP-ConferenceDirectory,CN=Schema,CN=Configuration,DC=X
+changetype: modify
+add: mayContain
+mayContain: msRTCSIP-ConferenceDirectoryId
+-
+
+dn: CN=ms-RTC-SIP-ConferenceDirectory,CN=Schema,CN=Configuration,DC=X
+changetype: modify
+add: mayContain
+mayContain: msRTCSIP-ConferenceDirectoryHomePool
+-
+
+dn: CN=ms-RTC-SIP-ConferenceDirectory,CN=Schema,CN=Configuration,DC=X
+changetype: modify
+add: mayContain
+mayContain: msRTCSIP-ConferenceDirectoryTargetPool
+-
+
+dn: CN=ms-RTC-SIP-ConferenceDirectory,CN=Schema,CN=Configuration,DC=X
+changetype: modify
+add: mayContain
+mayContain: msRTCSIP-ExtensionData
+-
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+##############################################################
+# Add schema class for monitoring server
+##############################################################
+
+dn: CN=ms-RTC-SIP-MonitoringServer,CN=Schema,CN=Configuration,DC=X
+changetype: add
+adminDescription: msRTCSIP-MonitoringServer
+adminDisplayName: msRTCSIP-MonitoringServer
+description: Stores data about monitoring servers.
+objectclass: classSchema
+governsID: 1.2.840.113556.1.6.24.2.70
+#schemaIDGUID: {397666C1-A52D-40A2-BF03-50036B1AF0EF}
+schemaIDGUID:: wWZ2OS2lokC/A1ADaxrw7w==
+# Allows Full Control for Domain Admins and SYSTEM
+defaultSecurityDescriptor: D:(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;DA)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;SY)
+rdnattid: cn
+objectClassCategory: 1
+possSuperiors: msRTCSIP-GlobalContainer
+subClassOf: container
+ldapDisplayName: msRTCSIP-MonitoringServer
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+dn: CN=ms-RTC-SIP-MonitoringServer,CN=Schema,CN=Configuration,DC=X
+changetype: modify
+add: mayContain
+mayContain: dnsHostName
+-
+
+dn: CN=ms-RTC-SIP-MonitoringServer,CN=Schema,CN=Configuration,DC=X
+changetype: modify
+add: mayContain
+mayContain: msRTCSIP-ServerVersion
+-
+
+dn: CN=ms-RTC-SIP-MonitoringServer,CN=Schema,CN=Configuration,DC=X
+changetype: modify
+add: mayContain
+mayContain: msRTCSIP-ExtensionData
+-
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+##############################################################
+# Global Mobility setting class/Attributes
+##############################################################
+
+dn: CN=ms-RTC-SIP-MobilityFlags,CN=Schema,CN=Configuration,DC=X
+changetype: add
+adminDescription: msRTCSIP-MobilityFlags
+adminDisplayName: msRTCSIP-MobilityFlags
+description: This attribute defines different options and flags that are used for mobility settings.
+objectclass: attributeSchema
+attributeID: 1.2.840.113556.1.6.24.1.194
+#schemaIDGUID: {55B41EB3-AA5C-4B93-878E-9B2D6ADE5ACE}
+schemaIDGUID:: sx60VVyqk0uHjpstat5azg==
+oMSyntax: 2
+attributeSyntax: 2.5.5.9
+isSingleValued: TRUE
+searchFlags: 0
+isMemberOfPartialAttributeSet: FALSE
+ldapDisplayName: msRTCSIP-MobilityFlags
+
+dn: CN=ms-RTC-SIP-MobilityPolicy,CN=Schema,CN=Configuration,DC=X
+changetype: add
+adminDescription: msRTCSIP-MobilityPolicy
+adminDisplayName: msRTCSIP-MobilityPolicy
+description: This attribute contains the distinguishedName of a mobility policy object.
+objectclass: attributeSchema
+attributeID: 1.2.840.113556.1.6.24.1.195
+#schemaIDGUID: {66160423-2CC3-490B-95B1-10ECD28B862D}
+schemaIDGUID:: IwQWZsMsC0mVsRDs0ouGLQ==
+oMSyntax: 127
+attributeSyntax: 2.5.5.1
+isSingleValued: TRUE
+searchFlags: 0
+isMemberOfPartialAttributeSet: FALSE
+ldapDisplayName: msRTCSIP-MobilityPolicy
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+dn: CN=ms-RTC-SIP-Mobility,CN=Schema,CN=Configuration,DC=X
+changetype: add
+adminDescription: msRTCSIP-Mobility
+adminDisplayName: msRTCSIP-Mobility
+description: Stores the global mobility settings.
+objectclass: classSchema
+governsID: 1.2.840.113556.1.6.24.2.71
+#schemaIDGUID: {2A9662C4-799C-4CC5-9C9B-B6918DAE354B}
+schemaIDGUID:: xGKWKpx5xUycm7aRja41Sw==
+# Allows Full Control for Domain Admins and SYSTEM
+defaultSecurityDescriptor: D:(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;DA)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;SY)
+rdnattid: cn
+objectClassCategory: 3
+subClassOf: top
+ldapDisplayName: msRTCSIP-Mobility
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+dn: CN=ms-RTC-SIP-Mobility,CN=Schema,CN=Configuration,DC=X
+changetype: modify
+add: mayContain
+mayContain: msRTCSIP-MobilityFlags
+-
+
+dn: CN=ms-RTC-SIP-Mobility,CN=Schema,CN=Configuration,DC=X
+changetype: modify
+add: mayContain
+mayContain: msRTCSIP-MobilityPolicy
+-
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+dn: CN=ms-RTC-SIP-GlobalContainer,CN=Schema,CN=Configuration,DC=X
+changetype: modify
+add: AuxiliaryClass
+AuxiliaryClass: msRTCSIP-Mobility
+-
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+##############################################################
+# Global Presence setting class/Attributes
+##############################################################
+
+dn: CN=ms-RTC-SIP-PresenceFlags,CN=Schema,CN=Configuration,DC=X
+changetype: add
+adminDescription: msRTCSIP-PresenceFlags
+adminDisplayName: msRTCSIP-PresenceFlags
+description: This attribute defines different options and flags that are used for presence settings.
+objectclass: attributeSchema
+attributeID: 1.2.840.113556.1.6.24.1.196
+#schemaIDGUID: {795CBCA5-40D8-4457-9977-DC9413417032}
+schemaIDGUID:: pbxcedhAV0SZd9yUE0FwMg==
+oMSyntax: 2
+attributeSyntax: 2.5.5.9
+isSingleValued: TRUE
+searchFlags: 0
+isMemberOfPartialAttributeSet: FALSE
+ldapDisplayName: msRTCSIP-PresenceFlags
+
+dn: CN=ms-RTC-SIP-PresencePolicy,CN=Schema,CN=Configuration,DC=X
+changetype: add
+adminDescription: msRTCSIP-PresencePolicy
+adminDisplayName: msRTCSIP-PresencePolicy
+description: This attribute contains the distinguishedName of a presence policy object.
+objectclass: attributeSchema
+attributeID: 1.2.840.113556.1.6.24.1.197
+#schemaIDGUID: {D8EA7E27-E302-4FE1-A864-BECC36885A12}
+schemaIDGUID:: J37q2ALj4U+oZL7MNohaEg==
+oMSyntax: 127
+attributeSyntax: 2.5.5.1
+isSingleValued: TRUE
+searchFlags: 0
+isMemberOfPartialAttributeSet: FALSE
+ldapDisplayName: msRTCSIP-PresencePolicy
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+dn: CN=ms-RTC-SIP-Presence,CN=Schema,CN=Configuration,DC=X
+changetype: add
+adminDescription: msRTCSIP-Presence
+adminDisplayName: msRTCSIP-Presence
+description: Stores the global presence settings.
+objectclass: classSchema
+governsID: 1.2.840.113556.1.6.24.2.72
+#schemaIDGUID: {CB15B8F2-8F3C-4155-A65D-737C2F9CE362}
+schemaIDGUID:: 8rgVyzyPVUGmXXN8L5zjYg==
+# Allows Full Control for Domain Admins and SYSTEM
+defaultSecurityDescriptor: D:(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;DA)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;SY)
+rdnattid: cn
+objectClassCategory: 3
+subClassOf: top
+ldapDisplayName: msRTCSIP-Presence
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+dn: CN=ms-RTC-SIP-Presence,CN=Schema,CN=Configuration,DC=X
+changetype: modify
+add: mayContain
+mayContain: msRTCSIP-PresenceFlags
+-
+
+dn: CN=ms-RTC-SIP-Presence,CN=Schema,CN=Configuration,DC=X
+changetype: modify
+add: mayContain
+mayContain: msRTCSIP-PresencePolicy
+-
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+dn: CN=ms-RTC-SIP-GlobalContainer,CN=Schema,CN=Configuration,DC=X
+changetype: modify
+add: AuxiliaryClass
+AuxiliaryClass: msRTCSIP-Presence
+-
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+##############################################################
+# CWA Bank setting class/Attributes
+##############################################################
+dn: CN=ms-RTC-SIP-DefaultCWAInternalURL,CN=Schema,CN=Configuration,DC=X
+changetype: add
+adminDescription: msRTCSIP-DefaultCWAInternalURL
+adminDisplayName: msRTCSIP-DefaultCWAInternalURL
+description: This attribute represents the internal URL of CWA bank.
+objectclass: attributeSchema
+attributeID: 1.2.840.113556.1.6.24.1.198
+#schemaIDGUID: {279d5ece-0504-4237-8473-ed829987bc0f}
+schemaIDGUID:: zl6dJwQFN0KEc+2CmYe8Dw==
+oMSyntax: 64
+attributeSyntax: 2.5.5.12
+isSingleValued: TRUE
+searchFlags: 0
+isMemberOfPartialAttributeSet: FALSE
+ldapDisplayName: msRTCSIP-DefaultCWAInternalURL
+
+dn: CN=ms-RTC-SIP-DefaultCWAExternalURL,CN=Schema,CN=Configuration,DC=X
+changetype: add
+adminDescription: msRTCSIP-DefaultCWAExternalURL
+adminDisplayName: msRTCSIP-DefaultCWAExternalURL
+description: This attribute represents the external URL of CWA bank.
+objectclass: attributeSchema
+attributeID: 1.2.840.113556.1.6.24.1.199
+#schemaIDGUID: {1cf22a80-491d-4e31-8d21-085d83809f67}
+schemaIDGUID:: gCryHB1JMU6NIQhdg4CfZw==
+oMSyntax: 64
+attributeSyntax: 2.5.5.12
+isSingleValued: TRUE
+searchFlags: 0
+isMemberOfPartialAttributeSet: FALSE
+ldapDisplayName: msRTCSIP-DefaultCWAExternalURL
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+dn: CN=ms-RTC-SIP-DefaultCWABank,CN=Schema,CN=Configuration,DC=X
+changetype: add
+adminDescription: msRTCSIP-DefaultCWABank
+adminDisplayName: msRTCSIP-DefaultCWABank
+description: Stores the CWA bank settings.
+objectclass: classSchema
+governsID: 1.2.840.113556.1.6.24.2.73
+#schemaIDGUID: {ea9091e0-fc29-4c04-8333-363158761a25}
+schemaIDGUID:: 4JGQ6in8BEyDMzYxWHYaJQ==
+# Allows Full Control for Domain Admins and SYSTEM
+defaultSecurityDescriptor: D:(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;DA)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;SY)
+rdnattid: cn
+objectClassCategory: 3
+subClassOf: top
+ldapDisplayName: msRTCSIP-DefaultCWABank
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+dn: CN=ms-RTC-SIP-DefaultCWABank,CN=Schema,CN=Configuration,DC=X
+changetype: modify
+add: mayContain
+mayContain: msRTCSIP-DefaultCWAInternalURL
+-
+
+dn: CN=ms-RTC-SIP-DefaultCWABank,CN=Schema,CN=Configuration,DC=X
+changetype: modify
+add: mayContain
+mayContain: msRTCSIP-DefaultCWAExternalURL
+-
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+dn: CN=ms-RTC-SIP-GlobalContainer,CN=Schema,CN=Configuration,DC=X
+changetype: modify
+add: AuxiliaryClass
+AuxiliaryClass: msRTCSIP-DefaultCWABank
+-
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+##############################################################
+# Added Attributes msRTCSIP-TrustedServiceFlags to msRTCSIP-TrustedService class
+##############################################################
+dn: CN=ms-RTC-SIP-TrustedServiceFlags,CN=Schema,CN=Configuration,DC=X
+changetype: add
+adminDescription: msRTCSIP-TrustedServiceFlags
+adminDisplayName: msRTCSIP-TrustedServiceFlags
+description: This attribute defines different options that are enabled for trusted service.
+objectclass: attributeSchema
+attributeID: 1.2.840.113556.1.6.24.1.200
+#schemaIDGUID:{2db62d6f-68c7-4f32-b4c1-c64b6a0b7d9f}
+schemaIDGUID:: by22LcdoMk+0wcZLagt9nw==
+oMSyntax: 2
+attributeSyntax: 2.5.5.9
+isSingleValued: TRUE
+searchFlags: 1
+isMemberOfPartialAttributeSet: TRUE
+ldapDisplayName: msRTCSIP-TrustedServiceFlags
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+dn: CN=ms-RTC-SIP-TrustedService,CN=Schema,CN=Configuration,DC=X
+changetype: modify
+add: mayContain
+mayContain: msRTCSIP-TrustedServiceFlags
+-
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+##############################################################
+# Added attributes msRTCSIP-RoutingPoolDN
+##############################################################
+dn: CN=ms-RTC-SIP-RoutingPoolDN,CN=Schema,CN=Configuration,DC=X
+changetype: add
+adminDescription: msRTCSIP-RoutingPoolDN
+adminDisplayName: msRTCSIP-RoutingPoolDN
+description: Pool DN of the trusted service entry.
+objectclass: attributeSchema
+attributeID: 1.2.840.113556.1.6.24.1.201
+#schemaIDGUID: {d904e6d4-7815-4920-9e87-52882727ca6c}
+schemaIDGUID:: 1OYE2RV4IEmeh1KIJyfKbA==
+oMSyntax: 127
+attributeSyntax: 2.5.5.1
+isSingleValued: TRUE
+searchFlags: 1
+isMemberOfPartialAttributeSet: TRUE
+ldapDisplayName: msRTCSIP-RoutingPoolDN
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+##############################################################
+# Added attributes msRTCSIP-RoutingPoolDN to msRTCSIP-TrustedService class
+##############################################################
+dn: CN=ms-RTC-SIP-TrustedService,CN=Schema,CN=Configuration,DC=X
+changetype: modify
+add: mayContain
+mayContain: msRTCSIP-RoutingPoolDN
+-
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+##############################################################
+# Added attributes msRTCSIP-RoutingPoolDN to msRTCSIP-TrustedMCU class
+##############################################################
+dn: CN=ms-RTC-SIP-TrustedMCU,CN=Schema,CN=Configuration,DC=X
+changetype: modify
+add: mayContain
+mayContain: msRTCSIP-RoutingPoolDN
+-
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+##############################################################
+# Replicate msRTCSIP-TrustedServerFQDN to GC in order to
+# support GC query based on the attribute
+##############################################################
+
+dn: CN=ms-RTC-SIP-TrustedServerFQDN,CN=Schema,CN=Configuration,DC=X
+changetype: modify
+replace:isMemberOfPartialAttributeSet
+isMemberOfPartialAttributeSet: TRUE
+-
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-

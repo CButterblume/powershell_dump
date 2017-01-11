@@ -1,0 +1,117 @@
+@"
+<html>
+<style>
+body
+{
+font-family:Arial,sans-serif;
+font-size:8pt;
+}
+table
+{
+border-collapse:collapse;
+font-size:8pt;
+font-family:Arial,sans-serif;
+border-collapse:collapse;
+min-width:400px;
+}
+table,th, td
+{
+border: 1px solid black;
+}
+th
+{
+text-align:center;
+font-size:18;
+font-weight:bold;
+}
+</style>
+<body>
+<font size="1" face="Arial,sans-serif">
+<h1 align="center">$Title</h1>
+<h4 align="center">Generated $([DateTime]::Now)</h3>
+
+</font><h2>Overall Summary</h2>
+<table border="0" cellpadding="3">
+<tr style="background-color:#B0B0B0"><th colspan="2">Environment Summary</th></tr>
+<tr><td>Number of DFS Servers Included</td><td>$(([array]$servers = $backlogStats.SendingMember + $backlogStatus.ReceivingMember | Select-Object -Unique).Count)</td></tr>
+<tr><td>Number of Replication Groups</td><td>$(($backlogStats.ReplicationGroup | Select-Object -Unique).Count)</td></tr>
+<tr><td>Number of Folders</td><td>$(($backlogStats.Folder | Select-Object -Unique).Count)</td></tr>
+<tr><td>Number of Folders with Backlog</td><td>$(($backlogStats | Where-Object { $_.Backlog -gt 0 }).Count)</td></tr>
+<tr><td>Total Number of Backlogged Items</td><td>$(
+($backlogStats.Backlog | Measure-Object -Sum).Sum
+)</td></tr>
+</table>
+<br />
+<table border="0" cellpadding="3">
+<tr style="background-color:#B0B0B0"><th colspan="5">Connections with Large Backlog</th></tr>
+<tr style="background-color:#E9E9E9;font-weight:bold">
+<td>Replication Group</td><td>Folder</td><td>Receiving Member</td><td>Sending Member</td><td>Backlog</td>
+</tr>
+$(
+	$largeBacklog = $backlogStats | Where-Object { $_.Backlog -gt $LargeBacklogThreshold }
+	if (-not $largeBacklog.Count -gt 0)
+	{
+		"<tr><td colspan='5'>There are no DFS connections with large backlogs to display.</td></tr>"
+	}
+	foreach($rStat in ($largeBacklog | Group-Object ReplicationGroup))
+	{
+		"<tr><td rowspan='$($rStat.Group.Count)'>$($rStat.Name)</td>"
+		foreach($fStat in ($rStat.Group | Group-Object Folder))
+		{
+			"<td rowspan='$($fStat.Group.Count)'>$($fStat.Name)</td>"
+			[array]$out = @()
+			$fStat.Group | Foreach-Object { 
+				$row = "<td>$($_.ReceivingMember)</td><td>$($_.SendingMember)</td>"
+				if ($_.Backlog -gt $LargeBacklogThreshold)
+				{
+					$row += "<td style='background-color:#FC2222;'>$($_.Backlog)</td>"
+				} else {
+					$row += "<td style='background-color:#A9FFB5;'>$($_.Backlog)</td>"
+				}
+				$out += $row
+			}
+			$out -join "</tr>`r`n<tr>"
+			"</tr>`r`n"
+		}
+	}
+)
+</table>
+<br />
+
+</font><h2>DFS Replication Backlog Results</h2>
+<table border="0" cellpadding="3">
+<tr style="background-color:#B0B0B0"><th colspan="5">Backlog Results</th></tr>
+<tr style="background-color:#E9E9E9;font-weight:bold">
+<td>Replication Group</td><td>Folder</td><td>Receiving Member</td><td>Sending Member</td><td>Backlog</td>
+</tr>
+$(
+	if (-not $backlogStats.Count -gt 0)
+	{
+		"<tr><td colspan='5'>There are no DFS connections to display.</td></tr>"
+	}
+	foreach($rStat in ($backlogStats | Group-Object ReplicationGroup))
+	{
+		"<tr><td rowspan='$($rStat.Group.Count)'>$($rStat.Name)</td>"
+		foreach($fStat in ($rStat.Group | Group-Object Folder))
+		{
+			"<td rowspan='$($fStat.Group.Count)'>$($fStat.Name)</td>"
+			[array]$out = @()
+			$fStat.Group | Foreach-Object { 
+				$row = "<td>$($_.ReceivingMember)</td><td>$($_.SendingMember)</td>"
+				if ($_.Backlog -gt $LargeBacklogThreshold)
+				{
+					$row += "<td style='background-color:#FC2222;'>$($_.Backlog)</td>"
+				} else {
+					$row += "<td style='background-color:#A9FFB5;'>$($_.Backlog)</td>"
+				}
+				$out += $row
+			}
+			$out -join "</tr>`r`n<tr>"
+			"</tr>`r`n"
+		}
+	}
+)
+</table>
+</body>
+</html>
+"@

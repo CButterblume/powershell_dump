@@ -1,0 +1,10 @@
+# Defaults for "MS_Silverlight5"
+
+# if you define a value of "@error@" that variable must be defined in Konfig-Db
+# if you specify a different value that value will be taken as default if Konfig-DB does not define that variable
+# Take care of the special character <fs> ""  (!!it is not shown in notepad.exe, and display as space in wordpad.exe so use notepad++)
+
+# please make an entry for every variable your packet may use, 
+#   in order to be able to use this file for consistency checks in Konfig-DB generation of *.cfg files 
+
+# No values needed for package MS_Silverlight5

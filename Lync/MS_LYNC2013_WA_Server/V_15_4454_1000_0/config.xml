@@ -1,0 +1,8 @@
+<Configuration>
+	<Logging Type="verbose" Path="C:\RIS\Log\OWAS" Template="Wac Server Setup(*).log"/>
+	<Display Level="none" CompletionNotice="no" />
+	<Setting Id="USINGUIINSTALLMODE" Value="0"/>
+	<Setting Id="SETUPTYPE" Value="CLEAN_INSTALL"/>
+	<Setting Id="SETUP_REBOOT" Value="Never"/>
+	<INSTALLLOCATION Value="D:\Microsoft Office Web Apps" />
+</Configuration>

@@ -1,0 +1,139 @@
+# 1. Allow schema modifications by setting the following NT5 registry value
+#    HKEY_LOCAL_MACHINE\System\CurrentControlSet\Services\NTDS\Parameters
+#    add the value "Schema Update Allowed" as a REG_DWORD value 1
+# 2. Make sure you have wldap32.dll and ldifde.exe (both ship with NT5 builds 1728+)
+#
+# To import this file you type:
+#
+# ldifde -i -v -k -s <servername> -f ExternalSchema.ldf -c DC=X <defaultNamingContext> -b <admin account> <login domain> <password>
+#
+# e.g. ldifde -i -v -k -s DC1 -f ExternalSchema.ldf -c DC=X "DC=contoso,DC=com" -b administrator contoso *
+#
+# If you are applying the schema manually, upload the schema file in following sequence:
+#
+#       ExternalSchema.ldf
+#       ServerSchema.ldf
+#       BackCompatSchema.ldf
+#       VersionSchema.ldf
+
+
+##############################################################
+# Replicate thumbnailphoto attribute to GC for ABS.
+##############################################################
+
+dn: CN=Picture,CN=Schema,CN=Configuration,DC=X
+changetype: modify
+replace:isMemberOfPartialAttributeSet
+isMemberOfPartialAttributeSet: TRUE
+-
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
+
+##############################################################
+# Exchange voice mail setting schema.
+##############################################################
+dn: CN=ms-Exch-UC-Voice-Mail-Settings,CN=Schema,CN=Configuration,DC=X
+changetype: add
+adminDescription: ms-Exch-UC-Voice-Mail-Settings
+adminDisplayName: ms-Exch-UC-Voice-Mail-Settings
+attributeID: 1.2.840.113556.1.4.7000.102.51612
+attributeSecurityGuid:: VAGN5Pi80RGHAgDAT7lgUA==
+attributeSyntax: 2.5.5.12
+isMemberOfPartialAttributeSet: TRUE
+isSingleValued: FALSE
+lDAPDisplayName: msExchUCVoiceMailSettings
+name: ms-Exch-UC-Voice-Mail-Settings
+oMSyntax: 64
+objectCategory: CN=Attribute-Schema,<SchemaContainerDN>
+objectClass: attributeSchema
+rangeUpper: 1123
+schemaIdGuid:: uAB8sblGTkiwU9XCaDXxHg==
+searchFlags: 1
+
+
+dn:
+changetype: modify
+replace: schemaUpdateNow
+schemaUpdateNow: 1
+-
+
+
+dn: CN=Mail-Recipient,CN=Schema,CN=Configuration,DC=X
+changetype: modify
+add: mayContain
+mayContain: msExchUCVoiceMailSettings
+-
+
+
+dn:
+changetype: modify
+replace: schemaUpdateNow
+schemaUpdateNow: 1
+-
+
+##############################################################
+# Proxy-Addresses is replicated in GC and made searchable.
+##############################################################
+dn: CN=Proxy-Addresses,CN=Schema,CN=Configuration,DC=X
+changetype: modify
+replace: isMemberOfPartialAttributeSet
+isMemberOfPartialAttributeSet: TRUE
+-
+
+dn: CN=Proxy-Addresses,CN=Schema,CN=Configuration,DC=X
+changetype: modify
+replace: searchFlags
+searchFlags: 13
+-
+
+dn:
+changetype: modify
+replace: schemaUpdateNow
+schemaUpdateNow: 1
+-
+
+##############################################################
+# Exchange hold policies
+##############################################################
+dn: CN=ms-Exch-User-Hold-Policies,CN=Schema,CN=Configuration,DC=X
+changetype: add
+adminDescription: ms-Exch-User-Hold-Policies
+adminDisplayName: ms-Exch-User-Hold-Policies
+attributeID: 1.2.840.113556.1.4.7000.102.52071
+attributeSecurityGuid:: VAGN5Pi80RGHAgDAT7lgUA==
+attributeSyntax: 2.5.5.12
+isMemberOfPartialAttributeSet: TRUE
+isSingleValued: FALSE
+lDAPDisplayName: msExchUserHoldPolicies
+name: ms-Exch-User-Hold-Policies
+oMSyntax: 64
+objectCategory: CN=Attribute-Schema,<SchemaContainerDN>
+objectClass: attributeSchema
+rangeUpper: 40
+schemaIdGuid:: 26wyJMRxRU21qpvu42Yw/g==
+searchFlags: 11
+
+
+dn:
+changetype: modify
+replace: schemaUpdateNow
+schemaUpdateNow: 1
+-
+
+
+dn: CN=Mail-Recipient,CN=Schema,CN=Configuration,DC=X
+changetype: modify
+add: mayContain
+mayContain: msExchUserHoldPolicies
+-
+
+
+dn:
+changetype: modify
+replace: schemaUpdateNow
+schemaUpdateNow: 1
+-

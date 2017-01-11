@@ -1,0 +1,30 @@
+[BuildInfo]
+Serena=192.168.99.30
+Computer=PB98BUILD3
+User=baumh
+Date=29.02.2016 13:58:18,53
+
+[PDF]
+Version=1.0
+
+[Package Definition]
+PkgSourcePath=PKG
+Version=V_0_0_0_1
+Name=MS_WindowsIdentityFoundation
+Language=ALL
+Programs=Inst_V_0_0_0_1, Uninst_V_0_0_0_1
+Publisher=Atos
+
+[Inst_V_0_0_0_1]
+Name=Inst_V_0_0_0_1
+CommandLine=V_0_0_0_1\Install.cmd -Force
+CanRunWhen=AnyUserStatus
+UserInputRequired=False
+RemoveProgram=False
+
+[Uninst_V_0_0_0_1]
+Name=Uninst_V_0_0_0_1
+CommandLine=V_0_0_0_1\Install.cmd -Uninstall -Force
+CanRunWhen=AnyUserStatus
+UserInputRequired=False
+RemoveProgram=False

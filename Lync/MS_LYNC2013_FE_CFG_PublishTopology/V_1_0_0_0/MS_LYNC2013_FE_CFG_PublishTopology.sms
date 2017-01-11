@@ -1,0 +1,30 @@
+[BuildInfo]
+Serena=192.168.99.30
+Computer=CNSVINBLD002
+User=A563910
+Date=Thu 08/11/2016  8:56:18.15
+
+[PDF]
+Version=1.0
+
+[Package Definition]
+PkgSourcePath=PKG
+Version=V_1_0_0_0
+Name=MS_LYNC2013_FE_CFG_PublishTopology
+Language=ALL
+Programs=Inst_V_1_0_0_0, Uninst_V_1_0_0_0
+Publisher=Atos
+
+[Inst_V_1_0_0_0]
+Name=Inst_V_1_0_0_0
+CommandLine=V_1_0_0_0\Install.cmd -Force
+CanRunWhen=AnyUserStatus
+UserInputRequired=False
+RemoveProgram=False
+
+[Uninst_V_1_0_0_0]
+Name=Uninst_V_1_0_0_0
+CommandLine=V_1_0_0_0\Install.cmd -Uninstall -Force
+CanRunWhen=AnyUserStatus
+UserInputRequired=False
+RemoveProgram=False

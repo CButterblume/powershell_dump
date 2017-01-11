@@ -1,0 +1,44 @@
+# 1. Allow schema modifications by setting the following NT5 registry value
+#    HKEY_LOCAL_MACHINE\System\CurrentControlSet\Services\NTDS\Parameters
+#    add the value "Schema Update Allowed" as a REG_DWORD value 1
+# 2. Make sure you have wldap32.dll and ldifde.exe (both ship with NT5 builds 1728+)
+#
+# To import this file you type:
+#
+# ldifde -i -v -k -s <servername> -f schema.ldf -c DC=X <defaultNamingContext> -b <admin account> <login domain> <password>
+#
+# e.g. ldifde -i -v -k -s DC1 -f schema.ldf -c DC=X "DC=contoso,DC=com" -b administrator contoso *
+#
+# LCS SchemaVersion
+#     rangeUpper last used value: 1150
+#     rangeLower last used value: 2
+#
+# If you are applying the schema manually, upload the schema file in following sequence:
+#
+#       ExternalSchema.ldf
+#       ServerSchema.ldf
+#       BackCompatSchema.ldf
+#       VersionSchema.ldf
+
+
+##############################################################
+# Schema major/minor version change to 1150.3
+##############################################################
+
+dn: CN=ms-RTC-SIP-SchemaVersion,CN=Schema,CN=Configuration,DC=X
+changetype: modify
+replace: rangeUpper
+rangeUpper: 1150
+-
+
+dn: CN=ms-RTC-SIP-SchemaVersion,CN=Schema,CN=Configuration,DC=X
+changetype: modify
+replace: rangeLower
+rangeLower: 3
+-
+
+dn:
+changetype: modify
+replace: schemaupdatenow
+schemaupdatenow: 1
+-
