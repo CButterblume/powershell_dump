@@ -1,0 +1,25 @@
+## Defaults for "MS_EXCH2013_CFG_AdministrationCM"
+##
+## If Get-BLConfigDBVariables is called with the "-Defaults" argument, the values specifed here are taken as default settings for the variables, 
+## and can be overwritten by values from the ConfigDB during import.
+## Define a value of "@error@" to make sure the variable is defined in the ConfigDb; if the variable is missing in the ConfigDB, 
+## Get-BLConfigDBVariables will automatically throw an error during import.
+##
+## Please create an entry for EVERY ConfigDB variable your packet uses (if possible), 
+## in order to be able to use this file for consistency checks during the generation of *.cfg files from the ConfigDB.
+##
+## IMPORTANT NOTES about editing this file:
+## The file contains the special character ASCII 28, <FS>: "", as delimiter.
+## This character will not be shown in notepad.exe, and display as space in wordpad.exe; use Notepad++ to edit.
+## Make sure this file is saved as ANSI with the Windows-1252 code page (Notepad++), or values that contain characters >127 (like ÄÖÜ äöü ß) won't be displayed correctly.
+
+# von IF benutzte PseudoNamen
+CM_DC1_FQDN@error@
+CM_DOMAIN_NETBIOSNAME@error@
+CM_AD_CFG_DOMAINACCOUNT@error@User with rights to add user, groups and OUs to the CM Domain
+EX2013_CFG_LINKED_USER_PROPERTIES@error@Service User Exchange Plattform Linked	SVC_...	Vormals: AD_CFG_USER_0003_PROPERTIES
+EX2013_CFG_LINKED_USER_FUNCTION@error@Optional als Erkl?rung zur Variable EX2013_CFG_LINKED_USER_PROPERTIES
+EX2013_CFG_ADMIN_ROLE_GROUP@error@Role group Exchange Administrators		AR_...		Vormals: AD_CFG_GROUP_0001_PROPERTIES
+EX2013_CFG_ACCESS_GROUP@error@Access group Exchange Admin				ACC_...			Vormals: AD_CFG_GROUP_0002_PROPERTIES
+EX2013_CFG_OU_GROUPS_PATH@error@OU for groups		Vormals: AD_CFG_OU_0013_PATH
+EX2013_CFG_OU_USERS_PATH@error@OU for User			Vormals: AD_CFG_OU_0014_PATH

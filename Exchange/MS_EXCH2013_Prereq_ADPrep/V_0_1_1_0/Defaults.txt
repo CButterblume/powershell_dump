@@ -1,0 +1,17 @@
+## Defaults for "MS_EXCH2013_Prereq_ADPrep"
+##
+## If Get-BLConfigDBVariables is called with the "-Defaults" argument, the values specifed here are taken as default settings for the variables, 
+## and can be overwritten by values from the ConfigDB during import.
+## Define a value of "@error@" to make sure the variable is defined in the ConfigDb; if the variable is missing in the ConfigDB, 
+## Get-BLConfigDBVariables will automatically throw an error during import.
+##
+## Please create an entry for EVERY ConfigDB variable your packet uses (if possible), 
+## in order to be able to use this file for consistency checks during the generation of *.cfg files from the ConfigDB.
+##
+## IMPORTANT NOTES about editing this file:
+## The file contains the special character ASCII 28, <FS>: "", as delimiter.
+## This character will not be shown in notepad.exe, and display as space in wordpad.exe; use Notepad++ to edit.
+## Make sure this file is saved as ANSI with the Windows-1252 code page (Notepad++), or values that contain characters >127 (like ÄÖÜ äöü ß) won't be displayed correctly.
+AD_CFG_DOMAINACCOUNT@error@Account for active directory administration
+COMPUTER_RegisteredOrganizationBundeswehrName
+

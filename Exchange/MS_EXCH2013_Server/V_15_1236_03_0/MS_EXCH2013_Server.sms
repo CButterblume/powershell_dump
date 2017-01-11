@@ -1,0 +1,30 @@
+[BuildInfo]
+Serena=192.168.99.30
+Computer=PB98BUILD3
+User=baumh
+Date=02.06.2016  8:38:00,37
+
+[PDF]
+Version=1.0
+
+[Package Definition]
+PkgSourcePath=PKG
+Version=V_15_0847_32_0
+Name=MS_EXCH2013_Server
+Language=ALL
+Programs=Inst_V_15_0847_32_0, Uninst_V_15_0847_32_0
+Publisher=Atos
+
+[Inst_V_15_0847_32_0]
+Name=Inst_V_15_0847_32_0
+CommandLine=V_15_0847_32_0\Install.cmd -Force
+CanRunWhen=AnyUserStatus
+UserInputRequired=False
+RemoveProgram=False
+
+[Uninst_V_15_0847_32_0]
+Name=Uninst_V_15_0847_32_0
+CommandLine=V_15_0847_32_0\Install.cmd -Uninstall -Force
+CanRunWhen=AnyUserStatus
+UserInputRequired=False
+RemoveProgram=False

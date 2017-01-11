@@ -1,0 +1,30 @@
+[BuildInfo]
+Serena=192.168.99.30
+Computer=PB98BUILD3
+User=baumh
+Date=02.06.2016  9:01:47,33
+
+[PDF]
+Version=1.0
+
+[Package Definition]
+PkgSourcePath=PKG
+Version=V_0_1_0_0
+Name=MS_EXCH2013_CFG_MXRecords
+Language=ALL
+Programs=Inst_V_0_1_0_0, Uninst_V_0_1_0_0
+Publisher=Atos
+
+[Inst_V_0_1_0_0]
+Name=Inst_V_0_1_0_0
+CommandLine=V_0_1_0_0\Install.cmd -Force
+CanRunWhen=AnyUserStatus
+UserInputRequired=False
+RemoveProgram=False
+
+[Uninst_V_0_1_0_0]
+Name=Uninst_V_0_1_0_0
+CommandLine=V_0_1_0_0\Install.cmd -Uninstall -Force
+CanRunWhen=AnyUserStatus
+UserInputRequired=False
+RemoveProgram=False
